@@ -1,0 +1,33 @@
+version: '3.9'
+
+services:
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  app:
+    build:
+      context: ./server
+    container_name: express
+    ports:
+      - "4000:4000"
+    depends_on:
+      - mongo
+    env_file:
+      - ./server/.env 
+    environment: 
+      MONGO_URL: mongodb+srv://filipmilovanovic:amalap369@dev-cluster.ujisu.mongodb.net/?retryWrites=true&w=majority&appName=dev-cluster
+
+  client:
+    build:
+      context: ./client
+    container_name: client
+    ports:
+      - "8080:80"
+
+volumes:
+  mongo-data:

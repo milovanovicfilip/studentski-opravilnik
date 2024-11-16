@@ -20,7 +20,14 @@ app.use(express.urlencoded({extended: true}))
 }))*/
 app.use('/task',taskRouter)
 
-mongoose.connect(process.env.MONGO_URL, () => console.log("Connected to DB."));
+try{
+    await mongoose.connect(process.env.MONGO_URL);
+    console.log('Connected to DB');
+} catch (error){
+    console.error(error);
+}
+
+
 
 app.get('*',(req,res)=>{
     //res.sendFile(path.resolve(__dirname, "..", "client", "public", 'index.html'))

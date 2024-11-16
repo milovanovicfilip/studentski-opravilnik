@@ -20,7 +20,7 @@ services:
     env_file:
       - ./server/.env 
     environment: 
-      MONGO_URL: mongodb+srv://filipmilovanovic:amalap369@dev-cluster.ujisu.mongodb.net/?retryWrites=true&w=majority&appName=dev-cluster
+      MONGO_URL: ${MONGO_URL}
 
   client:
     build:

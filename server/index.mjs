@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import path from 'path'
 import cors from 'cors'
 import {taskRouter} from './Routers/Task.Router.mjs'
+import {Task} from './Models/Task.Model.mjs'
 import { fileURLToPath } from 'url'
 
 dotenv.config()
@@ -23,15 +24,21 @@ app.use('/task',taskRouter)
 try{
     await mongoose.connect(process.env.MONGO_URL);
     console.log('Connected to DB');
+
+const newTask = new Task({
+    title: "Prvi task",
+    content: "Opis",
+  });
+  
+  await newTask.save();
+  console.log('Task uspesno dodat v bazo');
 } catch (error){
     console.error(error);
 }
 
 
-
 app.get('*',(req,res)=>{
-    //res.sendFile(path.resolve(__dirname, "..", "client", "public", 'index.html'))
-    res.send();
+    res.sendFile(path.resolve(__dirname, "..", "client", "public", 'index.html'))
 })
 
 app.listen(PORT,()=>{

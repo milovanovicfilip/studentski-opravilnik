@@ -1,33 +1,18 @@
-version: '3.9'
-
 services:
-  mongo:
-    image: mongo:latest
-    container_name: mongo
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
-
   app:
     build:
       context: ./server
-    container_name: express
+      dockerfile: Dockerfile
+    container_name: server
     ports:
       - "4000:4000"
-    depends_on:
-      - mongo
     env_file:
-      - ./server/.env 
-    environment: 
-      MONGO_URL: ${MONGO_URL}
+      - ./server/.env
 
   client:
     build:
       context: ./client
+      dockerfile: Dockerfile
     container_name: client
     ports:
       - "8080:80"
-
-volumes:
-  mongo-data:

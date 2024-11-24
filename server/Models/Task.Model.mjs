@@ -8,7 +8,7 @@ const taskSchema = new mongoose.Schema({
   },
   content: {
     type: String,
-    required: true,
+    //required: true,
   },
   status: {
     type: String,

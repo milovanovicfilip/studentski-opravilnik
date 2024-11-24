@@ -10,7 +10,7 @@ dotenv.config();
 
 const app = express();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 4000;
 
 mongoose
   .connect(process.env.DB_URL, {
@@ -24,14 +24,16 @@ mongoose
     console.error("Failed to connect to MongoDB Atlas:", err.message);
   });
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, "..", "client", "public")));
 app.use(
   cors({
-    origin: "https://localhost:5500",
+    origin: ["http://localhost:8080", "https://localhost:5500"],
   })
 );
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use(express.static(path.join(__dirname, "..", "client", "public")));
+
 app.use("/api/tasks", taskRoutes);
 
 // Health Check Endpoint
@@ -50,5 +52,5 @@ app.get("*", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server listening on https://localhost:${PORT} ...`);
+  console.log(`Server listening on http://localhost:${PORT} ...`);
 });

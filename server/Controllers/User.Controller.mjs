@@ -1,5 +1,7 @@
 import crypto from "crypto";
+import dotenv from "dotenv";
 import { User } from "../Models/User.Model.js";
+dotenv.config();
 
 function generateRandom(length){
     let result = '';

@@ -1,5 +1,6 @@
 import express, {Router} from 'express';
 import UserController from '../Controllers/User.Controller.js';
+// Nisem se naredil
 import { authoriseUser } from '../utils/jwt.js';
 
 const router = express.Router();

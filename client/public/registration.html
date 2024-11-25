@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Registracija - Študentski opravilnik</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css"
+        rel="stylesheet">
+
+    <!-- CSS -->
+    <link href="assets/css/style.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container d-flex flex-column justify-content-center align-items-center vh-100">
+        <div class="card p-4" style="max-width: 400px; width: 100%;">
+            <h1 class="text-center mb-4">Registracija</h1>
+            <form id="registrationForm">
+                <div class="mb-3">
+                    <label for="fullName" class="form-label">Ime in priimek</label>
+                    <input type="text" class="form-control" id="fullName" placeholder="Vpišite vaše ime in priimek"
+                        required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" placeholder="Vpišite vaš email račun" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Geslo</label>
+                    <input type="password" class="form-control" id="password" placeholder="Vpišite geslo" required>
+                </div>
+                <div class="mb-3">
+                    <label for="confirmPassword" class="form-label">Potrdi geslo</label>
+                    <input type="password" class="form-control" id="confirmPassword" placeholder="Potrdite vašo geslo"
+                        required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Registracija</button>
+            </form>
+            <div class="text-center mt-3">
+                <p>Že imate račun? <a href="login.html">Prijavite se tukaj</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        document.getElementById('registrationForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (password !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+
+            try {
+                const response = await axios.post('http://localhost:4000/api/auth/register', { fullName, email, password });
+                alert('Registration successful');
+                // Redirect to login page
+                window.location.href = 'login.html';
+            } catch (error) {
+                alert('Registration failed: ' + (error.response?.data?.message || error.message));
+            }
+        });
+    </script>
+</body>
+
+</html>

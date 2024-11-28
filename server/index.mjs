@@ -3,10 +3,11 @@ import express from "express";
 import path from "path";
 import cors from "cors";
 import mongoose from "mongoose";
-import { Task } from './Models/Task.Model.mjs'
+import { Task } from './Models/Task.Model.mjs';
 import { fileURLToPath } from "url";
 import taskRouter from "./Routes/Task.Router.mjs";
-import userRouter from "./Routes/User.Router.mjs"
+import userRouter from "./Routes/User.Router.mjs";
+import websiteRouter from "./Routes/Website.Router.mjs";
 
 dotenv.config();
 
@@ -35,10 +36,19 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(express.static(path.join(__dirname, "..", "client", "public")));
+// static files
+app.use(express.static(path.join(__dirname, '../client/public')));
+
+// ejs setup
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
+app.use('/', websiteRouter);
+
+
 
 app.use("/api/tasks", taskRouter);
-app.use("api/user", userRouter)
+app.use("/api/user", userRouter)
 
 
 // Health Check Endpoint
@@ -51,14 +61,7 @@ app.get("/api/health", (req, res) => {
     dbConnection: states[dbState] || "Unknown",
   });
 });
-const newTask = new Task({
-  title: "Dokončaj projekt",
-  content: "Dokončati moram nalogo za šolo do konca tedna.",
-  status: "in-progress",
-  priority: "high",
-  dueDate: new Date("2024-11-25"),
-  tags: ["šola", "projekt"],
-});
+
 
 // Shrani dokument v bazo
 const savedTask = await newTask.save();

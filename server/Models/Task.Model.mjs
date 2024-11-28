@@ -8,7 +8,7 @@ const taskSchema = new mongoose.Schema({
   },
   content: {
     type: String,
-    required: true,
+    //required: true,
   },
   status: {
     type: String,
@@ -35,4 +35,4 @@ const taskSchema = new mongoose.Schema({
   ],
 });
 
-export const Task = mongoose.model("Task", taskSchema, "Task");
+export const Task = mongoose.model("Task", taskSchema);

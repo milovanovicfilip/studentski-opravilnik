@@ -1,8 +1,9 @@
-import crypto from "crypto";
+import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import { User } from "../Models/User.Model.js";
 dotenv.config();
 
+/*import crypto from "crypto";
 function generateRandom(length){
     let result = '';
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -22,10 +23,41 @@ function Hash(data, salt){
     }
 
     return cypher;
-}
+}*/
 
 export default class UserController{
     constructor(){}
+    async addUser(request, response) {
+        const { username, email, password } = request.body;
+
+        if (!username || !email || !password) {
+            return response.status(400).json({ error: "Vsa polja so obvezna!" });
+        }
+
+        try {
+            const existingUser = await User.findOne({ email });
+            if (existingUser) {
+                return res.status(400).json({ error: "Uporabnik že obstaja!" });
+            }
+
+            // hash gesla
+            const hashedPassword = await bcrypt.hash(password, 10);
+
+            const newUser = new User({
+                username,
+                email,
+                password: hashedPassword,
+            });
+
+            // shrani uporabnika v bazo
+            await newUser.save();
+
+            return response.status(201).json({ message: "Registracija uspešna", token: genJWT(user.id) });
+        } catch (error) {
+            console.log(error);
+            return response.status(500).json({ error: "Napaka na strežniku", details: error.message });
+        }
+    }
 
     addUser = async function (request, response) {
         try{

@@ -16,6 +16,9 @@
     <!-- CSS -->
     <link href="assets/css/style.css" rel="stylesheet">
     <link href="assets/css/list-style.css" rel="stylesheet">
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 
 <body>
@@ -23,7 +26,7 @@
         <a href="index.html" class="logo d-flex align-items-center">
             <img src="assets/img/logo.png" alt="Študentski logo" width="35%">
         </a>
-        <h1><b></bold>Študentski opravilnik</b></h1>
+        <h1><b>Študentski opravilnik</b></h1>
 
         <nav class="header-nav ms-auto">
             <ul class="d-flex align-items-center list-unstyled mb-0">
@@ -89,7 +92,8 @@
                     </button>
                 </div>
 
-                <div id="taskForm" class="task-form">
+                <div id="taskForm" class="task-form" style="display: none;">
+                    <input type="hidden" id="taskId"> <!-- Hidden input for task ID -->
                     <div class="form-group">
                         <label for="taskName">Naslov naloge</label>
                         <input type="text" id="taskName" class="form-control" placeholder="Vnesite naslov naloge">
@@ -101,52 +105,121 @@
                     <div class="form-group">
                         <label for="taskPriority">Prioriteta</label>
                         <select id="taskPriority" class="form-control">
-                            <option value="nizka">Nizka</option>
-                            <option value="srednja">Srednja</option>
-                            <option value="visoka">Visoka</option>
+                            <option value="low">Nizka</option>
+                            <option value="medium">Srednja</option>
+                            <option value="high">Visoka</option>
                         </select>
                     </div>
                     <div class="form-buttons">
-                        <button class="btn btn-primary" onclick="addTask()">Dodaj</button>
+                        <button class="btn btn-primary" onclick="saveTask()">Shrani</button>
                         <button class="btn btn-icon" onclick="toggleForm()">Prekliči</button>
                     </div>
                 </div>
 
                 <div id="taskList">
-                    <!-- example item -->
-                    <div class="task-item">
-                        <div class="task-content">
-                            <label class="custom-checkbox">
-                                <input type="checkbox">
-                                <i class="bi bi-check"></i>
-                            </label>
-                            <div class="task-details">
-                                <div class="task-name">Seminarska naloga</div>
-                                <div class="task-meta">Rok: 20.11.2024 | Prioriteta: Visoka</div>
-                            </div>
-                        </div>
-                        <div class="task-actions">
-                            <button class="btn btn-icon">
-                                <i class="bi bi-pencil-square"></i>
-                            </button>
-                            <button class="btn btn-icon">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </div>
-                    </div>
+                    <!-- Tasks rendered here -->
                 </div>
             </div>
 
             <script>
+                const baseUrl = "http://localhost:4000/api/tasks";
+
                 function toggleForm() {
                     const form = document.getElementById('taskForm');
                     form.style.display = form.style.display === 'none' ? 'block' : 'none';
                 }
 
-                // ..... to be connected with backend
-                function addTask() {
-                    // something
+                async function loadTasks() {
+                    try {
+                        const response = await axios.get(baseUrl);
+                        const tasks = response.data;
+
+                        const taskList = document.getElementById("taskList");
+                        taskList.innerHTML = "";
+
+                        tasks.forEach(task => {
+                            const taskItem = document.createElement("div");
+                            taskItem.className = "task-item";
+                            taskItem.innerHTML = `
+                                <div class="task-content">
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" ${task.status === "completed" ? "checked" : ""}>
+                                        <i class="bi bi-check"></i>
+                                    </label>
+                                    <div class="task-details">
+                                        <div class="task-name">${task.title}</div>
+                                        <div class="task-meta">Rok: ${task.dueDate} | Prioriteta: ${task.priority}</div>
+                                    </div>
+                                </div>
+                                <div class="task-actions">
+                                    <button class="btn btn-icon" onclick="populateEditForm('${task._id}')">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+                                    <button class="btn btn-icon" onclick="deleteTask('${task._id}')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            `;
+                            taskList.appendChild(taskItem);
+                        });
+                    } catch (error) {
+                        console.error("Failed to load tasks:", error.response?.data || error.message);
+                    }
                 }
+
+                async function populateEditForm(taskId) {
+                    try {
+                        const response = await axios.get(`${baseUrl}/${taskId}`);
+                        const task = response.data;
+
+                        document.getElementById("taskId").value = task._id;
+                        document.getElementById("taskName").value = task.title;
+                        document.getElementById("taskDate").value = task.dueDate.split("T")[0];
+                        document.getElementById("taskPriority").value = task.priority;
+
+                        toggleForm();
+                    } catch (error) {
+                        console.error("Failed to populate edit form:", error.response?.data || error.message);
+                    }
+                }
+
+                async function saveTask() {
+                    const taskId = document.getElementById("taskId").value;
+                    const taskName = document.getElementById("taskName").value;
+                    const taskDate = document.getElementById("taskDate").value;
+                    const taskPriority = document.getElementById("taskPriority").value;
+
+                    const taskData = {
+                        title: taskName,
+                        dueDate: taskDate,
+                        priority: taskPriority,
+                        status: "pending",
+                    };
+
+                    try {
+                        if (taskId) {
+                            await axios.put(`${baseUrl}/${taskId}`, taskData);
+                        } else {
+                            await axios.post(baseUrl, taskData);
+                        }
+
+                        toggleForm();
+                        loadTasks();
+                    } catch (error) {
+                        console.error("Failed to save task:", error.response?.data || error.message);
+                    }
+                }
+
+                async function deleteTask(taskId) {
+                    try {
+                        await axios.delete(`${baseUrl}/${taskId}`);
+                        loadTasks();
+                    } catch (error) {
+                        console.error("Failed to delete task:", error.response?.data || error.message);
+                    }
+                }
+
+                loadTasks();
             </script>
         </main>
     </div>

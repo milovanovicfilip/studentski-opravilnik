@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema({
     },
     avatarUrl: {
         type: String,
-        match: [/^https?:\/\/.+\..+/, "Invalid URL format."],
+        match: [/^https?:\/\/.+\..+/, "Neveljaven URL format."],
     },
     tasks: [{
         type: mongoose.Schema.Types.ObjectId,

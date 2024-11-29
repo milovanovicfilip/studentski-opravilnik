@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
-import { User } from "../Models/User.Model.js";
+import { User } from "../Models/User.Model.mjs";
 dotenv.config();
 
 /*import crypto from "crypto";
@@ -25,8 +25,8 @@ function Hash(data, salt){
     return cypher;
 }*/
 
-export default class UserController{
-    constructor(){}
+export default class UserController {
+    constructor() { }
     async addUser(request, response) {
         const { username, email, password } = request.body;
 
@@ -60,77 +60,77 @@ export default class UserController{
     }
 
     addUser = async function (request, response) {
-        try{
+        try {
 
-            return response.status(200).json({message: "User created successfully", token: genJWT(user.id)});
+            return response.status(200).json({ message: "User created successfully", token: genJWT(user.id) });
         }
-        catch(error){
+        catch (error) {
             console.log(error);
-            return response.status(500).json({message: 'An unexpected error occurred'});
+            return response.status(500).json({ message: 'An unexpected error occurred' });
         }
     }
 
     removeUser = async function (request, response) {
         try {
-    
-            return response.status(200).json({message: "User deleted successfully"});
-        } catch(error) {
+
+            return response.status(200).json({ message: "User deleted successfully" });
+        } catch (error) {
             console.log(error);
-            return response.status(500).json({message: "An unexpected error occurred"});
+            return response.status(500).json({ message: "An unexpected error occurred" });
         }
     }
 
-    loginUser = async function (request,response) {
+    loginUser = async function (request, response) {
         try {
-            
 
-            return response.status(200).json({message:"User sucessfully logged in", token: genJWT()});
-        } catch(error) {
-            console.error(error);
-            return response.status(500).json({message: "An unexpected error occurred"});
-        }
-    }
 
-    logoutUser = async function (request,response) {
-        try {
-        
-            return response.status(200).json({message:"User sucessfully logged out"});
+            return response.status(200).json({ message: "User sucessfully logged in", token: genJWT() });
         } catch (error) {
             console.error(error);
-            return response.status(500).json({message: "An unexpected error occurred"});
+            return response.status(500).json({ message: "An unexpected error occurred" });
         }
     }
 
-    updateProfile = async function (request,response) {
+    logoutUser = async function (request, response) {
         try {
-            
 
-            return response.status(200).json({message: "Sucessfully updated profile"});
-        } catch(error) {
+            return response.status(200).json({ message: "User sucessfully logged out" });
+        } catch (error) {
             console.error(error);
-            return response.status(500).json({message: "An unexpected error occurred"});
+            return response.status(500).json({ message: "An unexpected error occurred" });
         }
     }
 
-    getUserPosts = async function (request,response) {
-        try{
-           
+    updateProfile = async function (request, response) {
+        try {
+
+
+            return response.status(200).json({ message: "Sucessfully updated profile" });
+        } catch (error) {
+            console.error(error);
+            return response.status(500).json({ message: "An unexpected error occurred" });
+        }
+    }
+
+    getUserPosts = async function (request, response) {
+        try {
+
             return response.status(200).json(posts);
         }
-        catch(error){
+        catch (error) {
             console.log(error);
-            return response.status(500).json({message: 'An unexpexted error occurred'});
+            return response.status(500).json({ message: 'An unexpexted error occurred' });
         }
     }
 
-    getUserData = async function (request,response) {
-        try{
-            
+    getUserData = async function (request, response) {
+        try {
+
             return response.status(200).json(user);
         }
-        catch(error){
+        catch (error) {
             console.log(error);
-            return response.status(500).json({message: 'An unexpexted error occurred'});
+            return response.status(500).json({ message: 'An unexpexted error occurred' });
         }
     }
 }

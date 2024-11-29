@@ -3,11 +3,10 @@ import express from "express";
 import path from "path";
 import cors from "cors";
 import mongoose from "mongoose";
-import { Task } from './Models/Task.Model.mjs';
 import { fileURLToPath } from "url";
-import taskRouter from "./Routes/Task.Router.mjs";
-import userRouter from "./Routes/User.Router.mjs";
-import websiteRouter from "./Routes/Website.Router.mjs";
+import taskRouter from "./Routers/Task.Router.mjs";
+import userRouter from "./Routers/User.Router.mjs";
+import websiteRouter from "./Routers/Website.Router.mjs";
 
 dotenv.config();
 
@@ -46,7 +45,6 @@ app.set('views', path.join(__dirname, 'views'));
 app.use('/', websiteRouter);
 
 
-
 app.use("/api/tasks", taskRouter);
 app.use("/api/user", userRouter)
 
@@ -60,14 +58,6 @@ app.get("/api/health", (req, res) => {
     status: "Server is running",
     dbConnection: states[dbState] || "Unknown",
   });
-});
-
-
-// Shrani dokument v bazo
-const savedTask = await newTask.save();
-console.log("Vzorec je bil uspešno vnešen:", savedTask);
-app.get("*", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "..", "client", "public", "index.html"));
 });
 
 

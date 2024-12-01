@@ -1,29 +1,9 @@
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import { User } from "../Models/User.Model.mjs";
+import { SessionToken } from "../Models/SessionToken.Model.mjs";
+import { genJWT } from "../utils/jwt.js";
 dotenv.config();
-
-/*import crypto from "crypto";
-function generateRandom(length){
-    let result = '';
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    const charactersLength = characters.length;
-    for ( var i = 0; i < length; i++ ) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-    return result;
-}
-
-function Hash(data, salt){
-    const pepper = process.env.PEPPER;
-    let cypher = data + salt;
-
-    for (let i = 0; i < 1000; i++) {
-        cypher = crypto.createHash('sha512', pepper).update(cypher).digest('base64');
-    }
-
-    return cypher;
-}*/
 
 export default class UserController {
     constructor() { }
@@ -37,7 +17,7 @@ export default class UserController {
         try {
             const existingUser = await User.findOne({ email });
             if (existingUser) {
-                return res.status(400).json({ error: "Uporabnik že obstaja!" });
+                return response.status(400).json({ error: "Uporabnik že obstaja!" });
             }
 
             // hash gesla
@@ -52,21 +32,10 @@ export default class UserController {
             // shrani uporabnika v bazo
             await newUser.save();
 
-            return response.status(201).json({ message: "Registracija uspešna", token: genJWT(user.id) });
+            return response.status(201).json({ message: "Registracija uspešna" });
         } catch (error) {
             console.log(error);
             return response.status(500).json({ error: "Napaka na strežniku", details: error.message });
-        }
-    }
-
-    addUser = async function (request, response) {
-        try {
-
-            return response.status(200).json({ message: "User created successfully", token: genJWT(user.id) });
-        }
-        catch (error) {
-            console.log(error);
-            return response.status(500).json({ message: 'An unexpected error occurred' });
         }
     }
 
@@ -80,24 +49,41 @@ export default class UserController {
         }
     }
 
-    loginUser = async function (request, response) {
+    async loginUser(request, response) {
+        const { email, password } = request.body;
+
+        if (!email || !password) {
+            return response.status(400).json({ error: "Vsa polja so obvezna" });
+        }
+
         try {
+            // preveri DB
+            const user = await User.findOne({ email });
+            if (!user || !(await bcrypt.compare(password, user.password))) {
+                return response.status(400).json({ error: "Neveljaven email ali geslo" });
+            }
 
+            // ustvari žeton
+            const token = genJWT({ userId: user._id });
+            const sessionToken = new SessionToken({ userId: user._id, token });
+            await sessionToken.save();
 
-            return response.status(200).json({ message: "User sucessfully logged in", token: genJWT() });
+            return response.status(200).json({ token });
         } catch (error) {
             console.error(error);
-            return response.status(500).json({ message: "An unexpected error occurred" });
+            return response.status(500).json({ error: "Napaka na strežniku", details: error.message });
         }
     }
 
-    logoutUser = async function (request, response) {
-        try {
+    async logoutUser(request, response) {
+        const token = request.headers.authorization?.split(" ")[1];
 
-            return response.status(200).json({ message: "User sucessfully logged out" });
+        try {
+            await SessionToken.deleteOne({ token });
+            return response.status(200).json({ message: "Uporabnik uspešno odjavljen" });
         } catch (error) {
             console.error(error);
-            return response.status(500).json({ message: "An unexpected error occurred" });
+            return response.status(500).json({ error: "Napaka na strežniku", details: error.message });
         }
     }
 

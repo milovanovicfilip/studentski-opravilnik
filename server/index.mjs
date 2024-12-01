@@ -4,6 +4,7 @@ import path from "path";
 import cors from "cors";
 import mongoose from "mongoose";
 import { fileURLToPath } from "url";
+
 import taskRouter from "./Routers/Task.Router.mjs";
 import userRouter from "./Routers/User.Router.mjs";
 import websiteRouter from "./Routers/Website.Router.mjs";
@@ -46,7 +47,7 @@ app.use('/', websiteRouter);
 
 
 app.use("/api/tasks", taskRouter);
-app.use("/api/user", userRouter)
+app.use("/api/user", userRouter);
 
 
 // Health Check Endpoint

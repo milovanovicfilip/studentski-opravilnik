@@ -5,28 +5,6 @@ import { SessionToken } from "../Models/SessionToken.Model.mjs";
 import { genJWT } from "../utils/jwt.js";
 dotenv.config();
 
-/*import crypto from "crypto";
-function generateRandom(length){
-    let result = '';
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    const charactersLength = characters.length;
-    for ( var i = 0; i < length; i++ ) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-    return result;
-}
-
-function Hash(data, salt){
-    const pepper = process.env.PEPPER;
-    let cypher = data + salt;
-
-    for (let i = 0; i < 1000; i++) {
-        cypher = crypto.createHash('sha512', pepper).update(cypher).digest('base64');
-    }
-
-    return cypher;
-}*/
-
 export default class UserController {
     constructor() { }
     async addUser(request, response) {
@@ -39,7 +17,7 @@ export default class UserController {
         try {
             const existingUser = await User.findOne({ email });
             if (existingUser) {
-                return res.status(400).json({ error: "Uporabnik že obstaja!" });
+                return response.status(400).json({ error: "Uporabnik že obstaja!" });
             }
 
             // hash gesla
@@ -54,7 +32,7 @@ export default class UserController {
             // shrani uporabnika v bazo
             await newUser.save();
 
-            return response.status(201).json({ message: "Registracija uspešna", token: genJWT(user.id) });
+            return response.status(201).json({ message: "Registracija uspešna" });
         } catch (error) {
             console.log(error);
             return response.status(500).json({ error: "Napaka na strežniku", details: error.message });

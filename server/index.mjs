@@ -5,8 +5,8 @@ import cors from "cors";
 import mongoose from "mongoose";
 import { Task } from './Models/Task.Model.mjs'
 import { fileURLToPath } from "url";
-import taskRouter from "./Routes/Task.Router.mjs";
-import userRouter from "./Routes/User.Router.mjs"
+import taskRouter from "./Routers/Task.Router.mjs";
+import userRouter from "./Routers/User.Router.mjs"
 
 dotenv.config();
 
@@ -47,6 +47,7 @@ app.get("/api/health", (req, res) => {
     dbConnection: states[dbState] || "Unknown",
   });
 });
+
 const newTask = new Task({
   title: "Dokončaj projekt",
   content: "Dokončati moram nalogo za šolo do konca tedna.",

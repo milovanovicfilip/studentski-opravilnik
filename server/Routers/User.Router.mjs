@@ -1,6 +1,5 @@
 import express, {Router} from 'express';
-import UserController from '../Controllers/User.Controller.js';
-// Nisem se naredil
+import UserController from '../Controllers/User.Controller.mjs';
 import { authoriseUser } from '../utils/jwt.js';
 
 const router = express.Router();
@@ -17,4 +16,4 @@ router.delete('/:id',authoriseUser,userController.removeUser);
 
 router.put('/:id',authoriseUser,userController.updateProfile);
 
-export const userRouter = router;
+export default router;

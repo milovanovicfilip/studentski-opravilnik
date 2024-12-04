@@ -11,11 +11,11 @@ const projectSchema = new mongoose.Schema({
   },
   users: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'users'
+    ref: 'User'
   }],
   tasks: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'tasks'
+    ref: 'Task'
   }]
 });
 

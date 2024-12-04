@@ -23,14 +23,20 @@ const userSchema = new mongoose.Schema({
         type: String,
         match: [/^https?:\/\/.+\..+/, "Neveljaven URL format."],
     },
-    role: {
-        type: String,
-        enum: ["admin","manager","user"],
-        default: "user"
-    },
     tasks: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: "tasks"
+        ref: "Task"
+    }],
+    projects: [{
+        projectId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Project"
+        },
+        role: {
+            type: String,
+            enum: ["admin", "manager", "user"],
+            default: "user"
+        }
     }]
 });
 

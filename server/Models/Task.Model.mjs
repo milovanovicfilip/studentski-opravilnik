@@ -8,7 +8,6 @@ const taskSchema = new mongoose.Schema({
   },
   content: {
     type: String,
-    //required: true,
   },
   status: {
     type: String,
@@ -33,6 +32,10 @@ const taskSchema = new mongoose.Schema({
       trim: true,
     },
   ],
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'users'
+  }
 });
 
 export const Task = mongoose.model("Task", taskSchema);

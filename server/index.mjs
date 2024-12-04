@@ -3,16 +3,16 @@ import express from "express";
 import path from "path";
 import cors from "cors";
 import mongoose from "mongoose";
-import { Task } from './Models/Task.Model.mjs'
 import { fileURLToPath } from "url";
 import taskRouter from "./Routers/Task.Router.mjs";
-import userRouter from "./Routers/User.Router.mjs"
+import userRouter from "./Routers/User.Router.mjs";
+import websiteRouter from "./Routers/Website.Router.mjs";
 
 dotenv.config();
 
 const app = express();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 4000;
 
 mongoose
   .connect(process.env.DB_URL, {
@@ -26,16 +26,28 @@ mongoose
     console.error("Failed to connect to MongoDB Atlas:", err.message);
   });
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, "..", "client", "public")));
 app.use(
   cors({
-    origin: "https://localhost:5500",
+    origin: ["http://localhost:8080", "https://localhost:5500"],
   })
 );
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// static files
+app.use(express.static(path.join(__dirname, '../client/public')));
+
+// ejs setup
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
+app.use('/', websiteRouter);
+
+
 app.use("/api/tasks", taskRouter);
-app.use("api/user", userRouter)
+app.use("/api/user", userRouter);
+
 
 // Health Check Endpoint
 app.get("/api/health", (req, res) => {
@@ -47,6 +59,7 @@ app.get("/api/health", (req, res) => {
     dbConnection: states[dbState] || "Unknown",
   });
 });
+<<<<<<< HEAD
 
 const newTask = new Task({
   title: "Dokončaj projekt",
@@ -63,8 +76,10 @@ console.log("Vzorec je bil uspešno vnešen:", savedTask);
 app.get("*", (req, res) => {
   res.sendFile(path.resolve(__dirname, "..", "client", "public", "index.html"));
 });
+=======
+>>>>>>> dev
 
 
 app.listen(PORT, () => {
-  console.log(`Server listening on https://localhost:${PORT} ...`);
+  console.log(`Server listening on http://localhost:${PORT} ...`);
 });

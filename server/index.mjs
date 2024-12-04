@@ -59,26 +59,6 @@ app.get("/api/health", (req, res) => {
     dbConnection: states[dbState] || "Unknown",
   });
 });
-<<<<<<< HEAD
-
-const newTask = new Task({
-  title: "Dokončaj projekt",
-  content: "Dokončati moram nalogo za šolo do konca tedna.",
-  status: "in-progress",
-  priority: "high",
-  dueDate: new Date("2024-11-25"),
-  tags: ["šola", "projekt"],
-});
-
-// Shrani dokument v bazo
-const savedTask = await newTask.save();
-console.log("Vzorec je bil uspešno vnešen:", savedTask);
-app.get("*", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "..", "client", "public", "index.html"));
-});
-=======
->>>>>>> dev
-
 
 app.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT} ...`);

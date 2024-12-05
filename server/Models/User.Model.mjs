@@ -33,9 +33,8 @@ const userSchema = new mongoose.Schema({
             ref: "Project"
         },
         role: {
-            type: String,
-            enum: ["admin", "manager", "user"],
-            default: "user"
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Role"
         }
     }]
 });

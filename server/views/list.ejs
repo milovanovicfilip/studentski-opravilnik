@@ -68,7 +68,13 @@
                                     </label>
                                     <div class="task-details">
                                         <div class="task-name">${task.title}</div>
-                                        <div class="task-meta">Rok: ${task.dueDate} | Prioriteta: ${task.priority}</div>
+                                        <div class="task-meta">
+                                            Rok: ${new Date(task.dueDate).toLocaleDateString("sl-SI", { year: "numeric", month: "long", day: "numeric" })}
+                                            ${new Date(task.dueDate) < new Date() && task.status !== "completed"
+                                        ? `<span style="color: red; font-weight: bold;">(Zamujeno!)</span>` : ""}
+                                            | Prioriteta: ${{ low: "Nizka", medium: "Srednja", high: "Visoka" }[task.priority] || task.priority}
+                                            ${task.warning ? `<span style="color: red;">⚠️ Naloga kmalu poteče!</span>` : ""}
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="task-actions">

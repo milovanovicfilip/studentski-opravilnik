@@ -58,6 +58,12 @@
                             taskList.innerHTML = "";
 
                             tasks.forEach(task => {
+                                const dueDate = new Date(task.dueDate);
+                                const now = new Date();
+                                const isOverdue = dueDate < now && task.status !== "completed";
+                                const formattedDueDate = dueDate.toLocaleDateString("sl-SI", { year: "numeric", month: "long", day: "numeric" });
+                                const translatedPriority = { low: "Nizka", medium: "Srednja", high: "Visoka" }[task.priority] || task.priority;
+
                                 const taskItem = document.createElement("div");
                                 taskItem.className = "task-item";
                                 taskItem.innerHTML = `
@@ -69,10 +75,9 @@
                                     <div class="task-details">
                                         <div class="task-name">${task.title}</div>
                                         <div class="task-meta">
-                                            Rok: ${new Date(task.dueDate).toLocaleDateString("sl-SI", { year: "numeric", month: "long", day: "numeric" })}
-                                            ${new Date(task.dueDate) < new Date() && task.status !== "completed"
-                                        ? `<span style="color: red; font-weight: bold;">(Zamujeno!)</span>` : ""}
-                                            | Prioriteta: ${{ low: "Nizka", medium: "Srednja", high: "Visoka" }[task.priority] || task.priority}
+                                            Rok: ${formattedDueDate}
+                                            ${isOverdue ? `<span style="color: red; font-weight: bold;">(Zamujeno!)</span>` : ""}
+                                            | Prioriteta: ${translatedPriority}
                                             ${task.warning ? `<span style="color: red;">⚠️ Naloga kmalu poteče!</span>` : ""}
                                         </div>
                                     </div>

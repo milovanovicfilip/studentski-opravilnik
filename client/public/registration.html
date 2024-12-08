@@ -54,7 +54,7 @@
     <script>
         document.getElementById('registrationForm').addEventListener('submit', async (event) => {
             event.preventDefault();
-            const fullName = document.getElementById('fullName').value;
+            const username = document.getElementById('fullName').value;
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
@@ -65,7 +65,12 @@
             }
 
             try {
-                const response = await axios.post('http://localhost:4000/api/auth/register', { fullName, email, password });
+                const response = await axios.post('http://localhost:4000/api/user/register', {
+                    username,
+                    email,
+                    password
+                });
+
                 alert('Registration successful');
                 // Redirect to login page
                 window.location.href = 'login.html';

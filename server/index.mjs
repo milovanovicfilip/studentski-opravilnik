@@ -4,6 +4,7 @@ import path from "path";
 import cors from "cors";
 import mongoose from "mongoose";
 import { fileURLToPath } from "url";
+import { injectUser } from "./utils/jwt.js";
 
 import taskRouter from "./Routers/Task.Router.mjs";
 import userRouter from "./Routers/User.Router.mjs";
@@ -47,6 +48,9 @@ app.use((req, res, next) => {
 // Middleware for parsing JSON and form data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Inject user into templates
+app.use(injectUser);
 
 // Static files
 app.use(express.static(path.join(__dirname, "../client/public")));

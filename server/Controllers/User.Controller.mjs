@@ -39,38 +39,29 @@ export default class UserController {
   };
 
   // Login user
-  loginUser = async (request, response) => {
-    const { email, password } = request.body;
+  loginUser = async (req, res) => {
+    const { email, password } = req.body;
 
     if (!email || !password) {
-      return response.status(400).json({ error: "Vsa polja so obvezna" });
+      return res.status(400).json({ error: "Email and password are required" });
     }
 
     try {
       const user = await User.findOne({ email });
       if (!user) {
-        return response
-          .status(400)
-          .json({ error: "Neveljaven email ali geslo" });
+        return res.status(400).json({ error: "Invalid email or password" });
       }
 
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (!isPasswordValid) {
-        return response
-          .status(400)
-          .json({ error: "Neveljaven email ali geslo" });
+        return res.status(400).json({ error: "Invalid email or password" });
       }
 
-      const token = genJWT({ userId: user._id });
-      const sessionToken = new SessionToken({ userId: user._id, token });
-      await sessionToken.save();
-
-      return response.status(200).json({ token });
+      const token = genJWT({ userId: user._id, username: user.username });
+      return res.status(200).json({ token, message: "Login successful" });
     } catch (error) {
-      console.error("Error during user login:", error);
-      return response
-        .status(500)
-        .json({ error: "Napaka na strežniku", details: error.message });
+      console.error("Error during login:", error.message);
+      return res.status(500).json({ error: "Server error" });
     }
   };
 

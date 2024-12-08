@@ -10,11 +10,11 @@ import userRouter from "./Routers/User.Router.mjs";
 import websiteRouter from "./Routers/Website.Router.mjs";
 
 dotenv.config();
-
 const app = express();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 4000;
 
+// MongoDB connection
 mongoose
   .connect(process.env.DB_URL, {
     useNewUrlParser: true,
@@ -27,41 +27,50 @@ mongoose
     console.error("Failed to connect to MongoDB Atlas:", err.message);
   });
 
+// CORS configuration
 app.use(
   cors({
-    origin: ["http://localhost:8080", "https://localhost:5500"],
+    origin: "http://localhost:8080",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
   })
 );
 
+// Middleware for logging requests
+app.use((req, res, next) => {
+  console.log("Incoming request:", req.method, req.url);
+  console.log("Request headers:", req.headers);
+  next();
+});
+
+// Middleware for parsing JSON and form data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// static files
-app.use(express.static(path.join(__dirname, '../client/public')));
+// Static files
+app.use(express.static(path.join(__dirname, "../client/public")));
 
-// ejs setup
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+// EJS setup
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
 
-app.use('/', websiteRouter);
-
-
+// Routes
+app.use("/", websiteRouter);
 app.use("/api/tasks", taskRouter);
 app.use("/api/user", userRouter);
-
 
 // Health Check Endpoint
 app.get("/api/health", (req, res) => {
   const dbState = mongoose.connection.readyState;
   const states = ["Disconnected", "Connected", "Connecting", "Disconnecting"];
-
   res.status(200).json({
     status: "Server is running",
     dbConnection: states[dbState] || "Unknown",
   });
 });
 
-
+// Start server
 app.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT} ...`);
 });

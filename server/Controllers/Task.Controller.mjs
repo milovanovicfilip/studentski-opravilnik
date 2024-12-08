@@ -1,7 +1,7 @@
 import { Task } from "../Models/Task.Model.mjs";
 
 export default class TaskController {
-  constructor() {}
+  constructor() { }
 
   createTask = async (request, response) => {
     try {
@@ -14,6 +14,10 @@ export default class TaskController {
         dueDate,
         tags,
       });
+
+      const processedTask = calculateTaskStatus(newTask);
+      await Task.findByIdAndUpdate(newTask._id, processedTask, { new: true });
+
       response.status(201).json(newTask);
     } catch (error) {
       response.status(400).json({
@@ -26,7 +30,12 @@ export default class TaskController {
   getAllTasks = async (request, response) => {
     try {
       const tasks = await Task.find();
-      response.status(200).json(tasks);
+
+      const updatedTasks = tasks.map((task) => calculateTaskStatus(task));
+
+      await Promise.all(updatedTasks.map(task => task.save()));
+
+      response.status(200).json(updatedTasks);
     } catch (error) {
       response.status(500).json({
         message: "Failed to fetch tasks",
@@ -66,6 +75,9 @@ export default class TaskController {
         return response.status(404).json({ message: "Task not found" });
       }
 
+      const processedTask = calculateTaskStatus(updatedTask);
+      await Task.findByIdAndUpdate(id, processedTask, { new: true });
+
       response.status(200).json(updatedTask);
     } catch (error) {
       response.status(400).json({
@@ -93,4 +105,14 @@ export default class TaskController {
       });
     }
   };
+}
+
+function calculateTaskStatus(task) {
+  const now = new Date();
+  const dueDate = new Date(task.dueDate);
+
+  task.warning = !task.overdue && dueDate <= new Date(now.getTime() + 24 * 60 * 60 * 1000) && dueDate >= now;
+  task.overdue = dueDate < now && task.status !== "completed";
+
+  return task;
 }

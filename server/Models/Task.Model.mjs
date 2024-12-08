@@ -22,6 +22,13 @@ const taskSchema = new mongoose.Schema({
   dueDate: {
     type: Date,
   },
+  warning: {
+    type: Boolean, default: false
+  },
+  overdue: {
+    type: Boolean,
+    default: false
+  },
   createdAt: {
     type: Date,
     default: Date.now,

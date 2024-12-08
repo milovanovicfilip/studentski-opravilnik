@@ -67,30 +67,30 @@
                                 const taskItem = document.createElement("div");
                                 taskItem.className = "task-item";
                                 taskItem.innerHTML = `
-                                <div class="task-content">
-                                    <label class="custom-checkbox">
-                                        <input type="checkbox" ${task.status === "completed" ? "checked" : ""}>
-                                        <i class="bi bi-check"></i>
-                                    </label>
-                                    <div class="task-details">
-                                        <div class="task-name">${task.title}</div>
-                                        <div class="task-meta">
-                                            Rok: ${formattedDueDate}
-                                            ${isOverdue ? `<span style="color: red; font-weight: bold;">(Zamujeno!)</span>` : ""}
-                                            | Prioriteta: ${translatedPriority}
-                                            ${task.warning ? `<span style="color: red;">⚠️ Naloga kmalu poteče!</span>` : ""}
+                                    <div class="task-content">
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" ${task.status === "completed" ? "checked" : ""}>
+                                            <i class="bi bi-check"></i>
+                                        </label>
+                                        <div class="task-details">
+                                            ${isOverdue ? `<div style="color: red; font-weight: bold;">🚨 Zamujeno!</div>` : ""}
+                                            ${task.warning ? `<div style="color: orange;">⚠️ Naloga kmalu poteče!</div>` : ""}
+                                            <div class="task-name">${task.title}</div>
+                                            <div class="task-meta">
+                                                Rok: ${formattedDueDate}
+                                                | Prioriteta: ${translatedPriority}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="task-actions">
-                                    <button class="btn btn-icon" onclick="populateEditForm('${task._id}')">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </button>
-                                    <button class="btn btn-icon" onclick="deleteTask('${task._id}')">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </div>
-                            `;
+                                    <div class="task-actions">
+                                        <button class="btn btn-icon" onclick="populateEditForm('${task._id}')">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+                                        <button class="btn btn-icon" onclick="deleteTask('${task._id}')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                `;
                                 taskList.appendChild(taskItem);
                             });
                         } catch (error) {

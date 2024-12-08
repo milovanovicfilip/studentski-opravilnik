@@ -15,8 +15,8 @@ export default class TaskController {
         tags,
       });
 
-      newTask = calculateTaskStatus(newTask);
-      await newTask.save();
+      const processedTask = calculateTaskStatus(newTask);
+      await Task.findByIdAndUpdate(newTask._id, processedTask, { new: true });
 
       response.status(201).json(newTask);
     } catch (error) {
@@ -32,6 +32,8 @@ export default class TaskController {
       const tasks = await Task.find();
 
       const updatedTasks = tasks.map((task) => calculateTaskStatus(task));
+
+      await Promise.all(updatedTasks.map(task => task.save()));
 
       response.status(200).json(updatedTasks);
     } catch (error) {
@@ -73,8 +75,8 @@ export default class TaskController {
         return response.status(404).json({ message: "Task not found" });
       }
 
-      updatedTask = calculateTaskStatus(updatedTask);
-      await updatedTask.save();
+      const processedTask = calculateTaskStatus(updatedTask);
+      await Task.findByIdAndUpdate(id, processedTask, { new: true });
 
       response.status(200).json(updatedTask);
     } catch (error) {

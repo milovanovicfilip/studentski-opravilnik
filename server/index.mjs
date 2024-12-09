@@ -4,6 +4,7 @@ import path from "path";
 import cors from "cors";
 import mongoose from "mongoose";
 import { fileURLToPath } from "url";
+import "./utils/notifCron.mjs";
 
 import taskRouter from "./Routers/Task.Router.mjs";
 import userRouter from "./Routers/User.Router.mjs";

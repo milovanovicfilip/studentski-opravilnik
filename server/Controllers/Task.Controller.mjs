@@ -18,6 +18,13 @@ export default class TaskController {
       const processedTask = calculateTaskStatus(newTask);
       await Task.findByIdAndUpdate(newTask._id, processedTask, { new: true });
 
+      // preveri, ali je potrebno ustvariti opomnik
+      const taskDueDate = new Date(dueDate);
+      if (taskDueDate <= new Date(now.getTime() + 24 * 60 * 60 * 1000)) {
+        const message = `Naloga "${title}" kmalu poteče! Rok: ${dueDate}`;
+        await Notification.create({ taskId: newTask._id, message });
+      }
+
       response.status(201).json(newTask);
     } catch (error) {
       response.status(400).json({

@@ -93,4 +93,19 @@ export default class TaskController {
       });
     }
   };
+
+  searchTasks = async (request, response) => {
+    try{
+      const { title } = request.params;
+
+      const tasks = await Task.find({ title: new RegExp(title, 'i') });
+
+      response.status(200).json(tasks);
+    }catch(error){
+      response.status(400).json({
+        message: "Failed to search tasks",
+        error: error.message
+      })
+    }
+  }
 }

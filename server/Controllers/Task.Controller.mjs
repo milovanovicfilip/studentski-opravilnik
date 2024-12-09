@@ -104,7 +104,6 @@ export default class TaskController {
       const tasks = await Task.find({userId: request.user.id})
 
       const formattedTasks = tasks.map(task => ({
-        _id: task._id,
         title: task.title,
         content: task.content,
         status: task.status,
@@ -112,10 +111,9 @@ export default class TaskController {
         dueDate: task.dueDate,
         createdAt: task.createdAt,
         tags: task.tags.join(';'),
-        user: task.user
       }));
 
-      const fields = ["_id","title","content","status","priority","dueDate","createdAt","tags","user"]
+      const fields = ["title","content","status","priority","dueDate","createdAt","tags"]
       const parser = new Parser({ fields })
       const csv = parser.parse(formattedTasks);
 
@@ -132,7 +130,49 @@ export default class TaskController {
   
   importFromCSV = async (request, response) => {
     try{
-      //.si
+      if (!req.file) {
+        return res.status(400).json({
+          message: "No file uploaded"
+        });
+      }
+
+      const tasks = [];
+  
+      fs.createReadStream(req.file.path)
+        .pipe(csvParser())
+        .on('data', (row) => {
+          const task = {
+            title: row.title,
+            content: row.content,
+            status: row.status,
+            priority: row.priority,
+            dueDate: row.dueDate,
+            createdAt: row.createdAt,
+            tags: row.tags.join(';'),
+          };
+          tasks.push(task); 
+        })
+        .on('end', async () => {
+          try {
+            const createdTasks = await Task.insertMany(tasks);
+            
+            return res.status(201).json({
+              message: "Tasks created successfully",
+              tasks: createdTasks,
+            });
+          } catch (error) {
+            return res.status(500).json({
+              message: "Error while inserting tasks into the database",
+              error: error.message,
+            });
+          }
+        })
+        .on('error', (error) => {
+          return res.status(400).json({
+            message: "Error with importing from CSV",
+            error: error.message,
+          });
+        });
     }catch(error){
       response.status(500).json({
         message: "Error with importing from CSV",

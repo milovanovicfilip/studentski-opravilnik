@@ -39,6 +39,12 @@ const taskSchema = new mongoose.Schema({
       trim: true,
     },
   ],
+  dependencies: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Task",
+    },
+  ],
 });
 
 export const Task = mongoose.model("Task", taskSchema);

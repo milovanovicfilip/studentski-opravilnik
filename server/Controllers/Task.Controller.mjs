@@ -3,29 +3,34 @@ import { Task } from "../Models/Task.Model.mjs";
 export default class TaskController {
   constructor() { }
 
-  createTask = async (request, response) => {
+  createTask = async (req, res) => {
     try {
-      const { title, content, status, priority, dueDate, tags } = request.body;
-      const newTask = await Task.create({
+      const { title, content, status, priority, dueDate, tags, dependencies } = req.body;
+
+      const dependencyTasks = await Task.find({ _id: { $in: dependencies } });
+      if (dependencyTasks.some(task => task.status !== "completed")) {
+        return res.status(400).json({
+          message: "All dependencies must be completed before creating a task dependent on them.",
+        });
+      }
+
+      const newTask = new Task({
         title,
         content,
         status,
         priority,
         dueDate,
         tags,
+        dependencies,
       });
 
-      const processedTask = calculateTaskStatus(newTask);
-      await Task.findByIdAndUpdate(newTask._id, processedTask, { new: true });
-
-      response.status(201).json(newTask);
+      const savedTask = await newTask.save();
+      res.status(201).json(savedTask);
     } catch (error) {
-      response.status(400).json({
-        message: "Failed to create task",
-        error: error.message,
-      });
+      res.status(400).json({ message: "Failed to create task", error: error.message });
     }
   };
+
 
   getAllTasks = async (request, response) => {
     try {
@@ -62,28 +67,30 @@ export default class TaskController {
     }
   };
 
-  updateTask = async (request, response) => {
+  updateTask = async (req, res) => {
     try {
-      const { id } = request.params;
-      const updateData = request.body;
+      const { id } = req.params;
+      const updateData = req.body;
 
-      const updatedTask = await Task.findByIdAndUpdate(id, updateData, {
-        new: true,
-      });
+      if (updateData.status === "completed") {
+        const task = await Task.findById(id).populate("dependencies");
 
-      if (!updatedTask) {
-        return response.status(404).json({ message: "Task not found" });
+        if (!task) {
+          return res.status(404).json({ message: "Task not found" });
+        }
+
+        const incompleteDependencies = task.dependencies.filter(dep => dep.status !== "completed");
+        if (incompleteDependencies.length > 0) {
+          return res.status(400).json({
+            message: "Cannot mark task as completed until all dependencies are completed.",
+          });
+        }
       }
 
-      const processedTask = calculateTaskStatus(updatedTask);
-      await Task.findByIdAndUpdate(id, processedTask, { new: true });
-
-      response.status(200).json(updatedTask);
+      const updatedTask = await Task.findByIdAndUpdate(id, updateData, { new: true });
+      res.status(200).json(updatedTask);
     } catch (error) {
-      response.status(400).json({
-        message: "Failed to update task",
-        error: error.message,
-      });
+      res.status(400).json({ message: "Failed to update task", error: error.message });
     }
   };
 
@@ -103,6 +110,21 @@ export default class TaskController {
         message: "Failed to delete task",
         error: error.message,
       });
+    }
+  };
+
+  getDependencies = async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      const task = await Task.findById(id).populate("dependencies", "title status");
+      if (!task) {
+        return res.status(404).json({ message: "Task not found" });
+      }
+
+      res.status(200).json(task.dependencies);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch dependencies", error: error.message });
     }
   };
 }

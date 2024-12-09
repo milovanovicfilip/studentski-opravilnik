@@ -9,5 +9,7 @@ router.get("/", taskController.getAllTasks); // Read all
 router.get("/:id", taskController.getTaskById); // Read by ID
 router.put("/:id", taskController.updateTask); // Update
 router.delete("/:id", taskController.deleteTask); // Delete
+router.get("/:id/dependencies", taskController.getDependencies); // Dependencies
+
 
 export default router;

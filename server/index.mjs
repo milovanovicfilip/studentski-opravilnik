@@ -9,7 +9,7 @@ import "./utils/notifCron.mjs";
 import taskRouter from "./Routers/Task.Router.mjs";
 import userRouter from "./Routers/User.Router.mjs";
 import websiteRouter from "./Routers/Website.Router.mjs";
-import notificationRouter from "./Routes/Notification.Router.mjs";
+import notificationRouter from "./Routers/Notification.Router.mjs";
 
 
 dotenv.config();

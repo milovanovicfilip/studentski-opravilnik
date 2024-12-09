@@ -4,6 +4,11 @@ export default class ProjectController {
     async addProject(req, res) {
         const { name, description, members, dueDate, priority, tags } = req.body;
         try {
+            const users = await User.find({ _id: { $in: members } });
+               if (users.length !== members.length) {
+                   return res.status(400).json({ error: "One or more member IDs are invalid" });
+               }
+            
             const project = new Project({
                 name,
                 description,

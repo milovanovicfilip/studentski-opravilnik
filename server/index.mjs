@@ -50,6 +50,12 @@ app.use(cors({ origin: ["http://localhost:8080"], credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Middleware to pass session user to views
+app.use((req, res, next) => {
+  res.locals.user = req.session.user || null; // Pass session user to all views
+  next();
+});
+
 // Static files
 app.use(express.static(path.join(__dirname, "../client/public")));
 

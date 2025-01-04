@@ -3,6 +3,8 @@ import express from "express";
 import path from "path";
 import cors from "cors";
 import mongoose from "mongoose";
+import session from "express-session";
+import MongoStore from "connect-mongo";
 import { fileURLToPath } from "url";
 
 import taskRouter from "./Routers/Task.Router.mjs";
@@ -15,40 +17,50 @@ const app = express();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 4000;
 
+// MongoDB Connection
 mongoose
   .connect(process.env.DB_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
-  .then(() => {
-    console.log("Connected to MongoDB Atlas");
-  })
-  .catch((err) => {
-    console.error("Failed to connect to MongoDB Atlas:", err.message);
-  });
+  .then(() => console.log("Connected to MongoDB Atlas"))
+  .catch((err) =>
+    console.error("Failed to connect to MongoDB Atlas:", err.message)
+  );
 
+// Session Middleware
 app.use(
-  cors({
-    origin: ["http://localhost:8080", "https://localhost:5500"],
+  session({
+    secret: process.env.SESSION_SECRET, // Store this in .env
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.DB_URL,
+      ttl: 24 * 60 * 60, // 1 day session expiry
+    }),
+    cookie: {
+      secure: false, // Set to true if using HTTPS
+      httpOnly: true,
+    },
   })
 );
 
+// Middleware
+app.use(cors({ origin: ["http://localhost:8080"], credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// static files
-app.use(express.static(path.join(__dirname, '../client/public')));
+// Static files
+app.use(express.static(path.join(__dirname, "../client/public")));
 
-// ejs setup
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+// EJS setup
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
 
-app.use('/', websiteRouter);
-
-
+// Routers
+app.use("/", websiteRouter);
 app.use("/api/tasks", taskRouter);
 app.use("/api/user", userRouter);
-
 
 // Health Check Endpoint
 app.get("/api/health", (req, res) => {
@@ -61,7 +73,6 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-
-app.listen(PORT, () => {
-  console.log(`Server listening on http://localhost:${PORT} ...`);
-});
+app.listen(PORT, () =>
+  console.log(`Server running at http://localhost:${PORT}`)
+);

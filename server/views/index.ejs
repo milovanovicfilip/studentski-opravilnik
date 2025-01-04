@@ -1,11 +1,10 @@
 <%- include('partials/header') %>
 
-    <div class="d-flex">
-        <%- include('partials/sidebar') %>
-            <main>
-                <h2>Pozdravljen, {ime}!</h2>
-                <!-- Page-specific content here -->
-            </main>
-    </div>
+<div class="d-flex">
+  <%- include('partials/sidebar') %>
+  <main>
+    <h2>Pozdravljen, <%= user ? user.username : "Gost" %>!</h2>
+  </main>
+</div>
 
-    <%- include('partials/footer') %>
+<%- include('partials/footer') %>

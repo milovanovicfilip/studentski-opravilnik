@@ -43,7 +43,7 @@
         <div class="text-center mt-3">
           <p>
             Še nimate računa?
-            <a href="registration.html">Registrirajte se tukaj</a>
+            <a href="/registration">Registrirajte se tukaj</a>
           </p>
         </div>
       </div>
@@ -64,7 +64,6 @@
               { email, password },
               { withCredentials: true }
             );
-            alert("Login successful");
             window.location.href = "/dashboard";
           } catch (error) {
             alert(

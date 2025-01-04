@@ -63,7 +63,7 @@
           </button>
         </form>
         <div class="text-center mt-3">
-          <p>Že imate račun? <a href="login.html">Prijavite se tukaj</a></p>
+          <p>Že imate račun? <a href="/login">Prijavite se tukaj</a></p>
         </div>
       </div>
     </div>
@@ -91,8 +91,7 @@
               email,
               password,
             });
-            alert("Registracija uspešna!");
-            window.location.href = "login.html";
+            window.location.href = "/login";
           } catch (error) {
             alert(
               "Registracija ni uspela: " +

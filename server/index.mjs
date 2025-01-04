@@ -52,7 +52,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Middleware to pass session user to views
 app.use((req, res, next) => {
-  res.locals.user = req.session.user || null; // Pass session user to all views
+  res.locals.user = req.session.user || null;
   next();
 });
 

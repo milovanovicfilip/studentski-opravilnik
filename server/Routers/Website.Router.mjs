@@ -20,8 +20,8 @@ router.get("/kanban", (req, res) => {
   res.render("kanban", { title: "Kanban - Študentski opravilnik" });
 });
 
-router.get("/calendar", (req, res) => {
-  res.render("calendar", { title: "Koledar - Študentski opravilnik" });
+router.get('/calendar', (req, res) => {
+    res.render('calendar', { title: 'Koledar - Študentski opravilnik', page: 'calendar'});
 });
 
 router.get("/settings", (req, res) => {

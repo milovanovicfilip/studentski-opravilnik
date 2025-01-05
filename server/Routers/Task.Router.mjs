@@ -11,5 +11,6 @@ router.put("/:id", taskController.updateTask); // Update
 router.delete("/:id", taskController.deleteTask); // Delete
 router.get("/export/csv",taskController.exportToCSV);
 router.post("/import/csv",taskController.importFromCSV);
+router.get("/search/:title", taskController.searchTasks);
 
 export default router;

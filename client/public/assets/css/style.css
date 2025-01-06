@@ -1,34 +1,29 @@
 /* Root Variables */
 :root {
   --color-primary: #006385;
-  --color-primary-dark: #003B4F;
-  --color-secondary: #e0f7ff;
+  --color-secondary: #003B4F;
+  --color-light: #e0f7ff;
   --color-background: #f4f4f4;
-  --color-sidebar-bg: #f9fdff;
+  --color-white: #ffffff;
   --color-text-primary: #333;
   --color-text-secondary: #666;
-  --color-white: #fff;
-  --color-border: #ddd;
-  --font-family-base: 'Open Sans', sans-serif;
+  --font-family: 'Open Sans', sans-serif;
 }
 
-/* Global Reset */
+/* General Styles */
 body {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  font-family: var(--font-family-base);
+  font-family: var(--font-family);
   background-color: var(--color-background);
   color: var(--color-text-primary);
-  margin: 0;
 }
 
-/* Header */
 header {
-  font-family: var(--font-family-base);
+  font-family: var(--font-family);
   background-color: var(--color-primary);
   color: var(--color-white);
-  padding: 10px;
 }
 
 header .logo img {
@@ -36,7 +31,12 @@ header .logo img {
   height: auto;
 }
 
-/* Navigation */
+main {
+  flex-grow: 1;
+  padding: 20px;
+}
+
+/* Navigation Styles */
 .nav-icon,
 .nav-profile {
   text-decoration: none;
@@ -48,14 +48,7 @@ header .logo img {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.nav-icon:hover,
-.nav-profile:hover {
-  background-color: var(--color-secondary);
-  color: var(--color-primary);
-}
-
-.nav-icon i,
-.nav-profile i {
+.nav-icon i {
   font-size: 1.5rem;
   width: 40px;
   height: 40px;
@@ -64,28 +57,20 @@ header .logo img {
   align-items: center;
 }
 
-/* Dropdown */
-.dropdown-menu .dropdown-item {
-  color: var(--color-text-primary);
-  padding: 10px 15px;
-  display: flex;
-  align-items: center;
-  border-radius: 5px;
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
+.nav-icon:hover,
+.nav-profile:hover,
+.sidebar a:hover,
 .dropdown-menu .dropdown-item:hover {
-  background-color: var(--color-secondary);
+  background-color: var(--color-light);
   color: var(--color-primary);
 }
 
 /* Sidebar */
 .sidebar {
   height: 100vh;
-  background-color: var(--color-sidebar-bg);
+  background-color: var(--color-white);
   padding: 20px;
   width: 250px;
-  display: flex;
   flex-direction: column;
 }
 
@@ -99,20 +84,27 @@ header .logo img {
   margin-bottom: 10px;
 }
 
-.sidebar a:hover {
-  background-color: var(--color-secondary);
-  color: var(--color-primary);
+.sidebar a i {
+  margin-right: 10px;
 }
 
-/* Main Content */
-main {
-  flex-grow: 1;
-  padding: 20px;
+/* Dropdown */
+.dropdown-item {
+  color: var(--color-text-primary);
+  padding: 10px 15px;
+  display: flex;
+  align-items: center;
+  border-radius: 5px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dropdown-item i {
+  margin-right: 8px;
 }
 
 /* Task List */
 .task-list {
-  background-color: var(--color-sidebar-bg);
+  background-color: var(--color-white);
   border-radius: 8px;
   padding: 20px;
   margin: 20px;
@@ -124,12 +116,12 @@ main {
   align-items: center;
   margin-bottom: 20px;
   padding-bottom: 10px;
-  border-bottom: 2px solid var(--color-secondary);
+  border-bottom: 2px solid var(--color-light);
 }
 
 .task-title {
   font-size: 24px;
-  color: var(--color-primary-dark);
+  color: var(--color-secondary);
   margin: 0;
 }
 
@@ -142,6 +134,12 @@ main {
   background-color: var(--color-white);
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.task-content {
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
 .task-details {
@@ -158,6 +156,11 @@ main {
 .task-meta {
   font-size: 14px;
   color: var(--color-text-secondary);
+}
+
+.task-actions {
+  display: flex;
+  gap: 10px;
 }
 
 /* Buttons */
@@ -179,7 +182,7 @@ main {
 }
 
 .btn-primary:hover {
-  background-color: var(--color-primary-dark);
+  background-color: var(--color-secondary);
 }
 
 .btn-icon {
@@ -190,11 +193,11 @@ main {
 }
 
 .btn-icon:hover {
-  background-color: var(--color-secondary);
+  background-color: var(--color-light);
   color: var(--color-primary);
 }
 
-/* Forms */
+/* Form Styles */
 .task-form {
   display: none;
   margin-bottom: 20px;
@@ -217,12 +220,18 @@ main {
 .form-control {
   width: 100%;
   padding: 8px;
-  border: 1px solid var(--color-border);
+  border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 14px;
 }
 
-/* Checkbox */
+.form-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+/* Custom Checkbox */
 .custom-checkbox {
   width: 24px;
   height: 24px;
@@ -234,20 +243,26 @@ main {
   background-color: var(--color-white);
 }
 
-.custom-checkbox input {
-  display: none;
-}
-
 .custom-checkbox .bi-check {
   display: none;
   position: absolute;
-  top: 50%;
+  top: 60%;
   left: 50%;
   transform: translate(-50%, -50%);
   color: var(--color-primary);
   font-size: 20px;
+  font-weight: bold;
+}
+
+.custom-checkbox input {
+  display: none;
 }
 
 .custom-checkbox input:checked+.bi-check {
   display: block;
+}
+
+/* Shadows for Task Items */
+.task-item:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }

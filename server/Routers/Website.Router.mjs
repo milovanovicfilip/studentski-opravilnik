@@ -40,4 +40,11 @@ router.get("/registration", (req, res) => {
   res.render("registration", { title: "Registracija - Študentski opravilnik" });
 });
 
+router.get("/projects", (req, res) => {
+  res.render("projects", {
+    title: "Projekti - Študentski opravilnik",
+    userProjects: res.locals.userProjects,
+  });
+});
+
 export default router;

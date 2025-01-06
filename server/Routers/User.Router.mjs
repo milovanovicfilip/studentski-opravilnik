@@ -1,6 +1,6 @@
 import express from "express";
 import UserController from "../Controllers/User.Controller.mjs";
-import { authoriseUser } from "../utils/authoriseUser.js";
+import { authenticateUser } from "../utils/authenticateUser.js";
 
 const router = express.Router();
 const userController = new UserController();
@@ -11,8 +11,8 @@ router.get("/current", userController.getCurrentUser);
 router.post("/logout", userController.logoutUser);
 
 // Protected routes
-router.get("/getTasks/:id", authoriseUser, userController.getUserPosts);
-router.delete("/:id", authoriseUser, userController.removeUser);
-router.put("/:id", authoriseUser, userController.updateProfile);
+router.get("/getTasks/:id", authenticateUser, userController.getUserPosts);
+router.delete("/:id", authenticateUser, userController.removeUser);
+router.put("/:id", authenticateUser, userController.updateProfile);
 
 export default router;

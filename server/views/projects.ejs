@@ -1,0 +1,181 @@
+<%- include('partials/header') %>
+
+<div class="d-flex">
+  <%- include('partials/sidebar') %>
+  <main>
+    <div class="project-list">
+      <div class="project-header">
+        <h1 class="project-title">Seznam projektov</h1>
+        <button class="btn btn-primary" onclick="toggleProjectForm()">
+          <i class="bi bi-plus"></i>
+          Nov projekt
+        </button>
+      </div>
+
+      <div id="projectForm" class="project-form" style="display: none">
+        <input type="hidden" id="projectId" />
+        <!-- Hidden input for project ID -->
+        <div class="form-group">
+          <label for="projectName">Naslov projekta</label>
+          <input
+            type="text"
+            id="projectName"
+            class="form-control"
+            placeholder="Vnesite naslov projekta"
+          />
+        </div>
+        <div class="form-group">
+          <label for="projectDescription">Opis</label>
+          <textarea
+            id="projectDescription"
+            class="form-control"
+            placeholder="Dodajte opis projekta"
+          ></textarea>
+        </div>
+        <div class="form-buttons">
+          <button class="btn btn-primary" onclick="saveProject()">
+            Shrani
+          </button>
+          <button class="btn btn-icon" onclick="toggleProjectForm()">
+            Prekliči
+          </button>
+        </div>
+      </div>
+
+      <div id="projectList">
+        <!-- Projects rendered here -->
+      </div>
+    </div>
+
+    <script>
+      const projectBaseUrl = "http://localhost:4000/api/projects";
+
+      function toggleProjectForm() {
+        console.log("Toggling project form visibility");
+        const form = document.getElementById("projectForm");
+        form.style.display = form.style.display === "none" ? "block" : "none";
+      }
+
+      async function loadProjects() {
+        console.log("Loading projects...");
+        try {
+          const response = await axios.get(projectBaseUrl);
+          const projects = response.data;
+
+          console.log("Projects loaded:", projects);
+
+          const projectList = document.getElementById("projectList");
+          projectList.innerHTML = "";
+
+          projects.forEach((project) => {
+            const projectItem = document.createElement("div");
+            projectItem.className = "project-item";
+            projectItem.innerHTML = `
+          <div class="project-content">
+              <div class="project-details">
+                  <div class="project-name">${project.name}</div>
+                  <div class="project-meta">${
+                    project.description || "Brez opisa"
+                  }</div>
+              </div>
+          </div>
+          <div class="project-actions">
+              <button class="btn btn-icon" onclick="populateEditProjectForm('${
+                project._id
+              }')">
+                  <i class="bi bi-pencil-square"></i>
+              </button>
+              <button class="btn btn-icon" onclick="deleteProject('${
+                project._id
+              }')">
+                  <i class="bi bi-trash"></i>
+              </button>
+          </div>
+      `;
+            projectList.appendChild(projectItem);
+          });
+        } catch (error) {
+          console.error(
+            "Failed to load projects:",
+            error.response?.data || error.message
+          );
+        }
+      }
+
+      async function populateEditProjectForm(projectId) {
+        console.log(`Populating edit form for project ID: ${projectId}`);
+        try {
+          const response = await axios.get(`${projectBaseUrl}/${projectId}`);
+          const project = response.data;
+
+          console.log("Project data to edit:", project);
+
+          document.getElementById("projectId").value = project._id;
+          document.getElementById("projectName").value = project.name;
+          document.getElementById("projectDescription").value =
+            project.description;
+
+          toggleProjectForm();
+        } catch (error) {
+          console.error(
+            "Failed to populate edit form:",
+            error.response?.data || error.message
+          );
+        }
+      }
+
+      async function saveProject() {
+        console.log("Saving project...");
+        const projectId = document.getElementById("projectId").value;
+        const projectName = document.getElementById("projectName").value;
+        const projectDescription =
+          document.getElementById("projectDescription").value;
+
+        const projectData = {
+          name: projectName,
+          description: projectDescription,
+        };
+
+        console.log("Project data to save:", projectData);
+
+        try {
+          if (projectId) {
+            console.log(`Updating project with ID: ${projectId}`);
+            await axios.put(`${projectBaseUrl}/${projectId}`, projectData);
+          } else {
+            console.log("Creating new project");
+            await axios.post(projectBaseUrl, projectData);
+          }
+
+          console.log("Project saved successfully");
+          toggleProjectForm();
+          loadProjects();
+        } catch (error) {
+          console.error(
+            "Failed to save project:",
+            error.response?.data || error.message
+          );
+        }
+      }
+
+      async function deleteProject(projectId) {
+        console.log(`Deleting project with ID: ${projectId}`);
+        try {
+          await axios.delete(`${projectBaseUrl}/${projectId}`);
+          console.log("Project deleted successfully");
+          loadProjects();
+        } catch (error) {
+          console.error(
+            "Failed to delete project:",
+            error.response?.data || error.message
+          );
+        }
+      }
+
+      console.log("Initializing project page");
+      loadProjects();
+    </script>
+  </main>
+</div>
+
+<%- include('partials/footer') %>

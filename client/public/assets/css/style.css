@@ -10,6 +10,14 @@
   --font-family: 'Open Sans', sans-serif;
 }
 
+body.dark-mode {
+  --color-background: #333;
+  --color-white: #1a1a1a;
+  --color-text-primary: #f4f4f4;
+  --color-text-secondary: #ccc;
+  --color-light: #2c2c2c;
+}
+
 /* General Styles */
 body {
   display: flex;
@@ -34,6 +42,26 @@ header .logo img {
 main {
   flex-grow: 1;
   padding: 20px;
+}
+
+/* Dark mode styles */
+body.dark-mode .task-title {
+  color: var(--color-text-primary);
+}
+
+body.dark-mode .task-item {
+  background-color: var(--color-light);
+  box-shadow: 0 2px 4px rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode header,
+body.dark-mode .sidebar {
+  background-color: var(--color-white);
+  color: var(--color-text-primary);
+}
+
+body.dark-mode .custom-checkbox {
+  background-color: var(--color-white);
 }
 
 /* Navigation Styles */
@@ -265,4 +293,51 @@ main {
 /* Shadows for Task Items */
 .task-item:hover {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Darkmode Switcher */
+.dark-mode-switch {
+  margin-right: 10px;
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 25px;
+}
+
+.dark-mode-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  border-radius: 25px;
+  transition: 0.4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 5px;
+  bottom: 2.5px;
+  background-color: white;
+  border-radius: 50%;
+  transition: 0.4s;
+}
+
+input:checked+.slider {
+  background-color: var(--color-primary);
+}
+
+input:checked+.slider:before {
+  transform: translateX(25px);
 }

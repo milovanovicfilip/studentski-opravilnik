@@ -18,7 +18,7 @@ export default class NewsController {
         }
     }
 
-    // napolni mongodb collection, če je prazna (drugače pride do napake v home page)
+    // napolni newsfeed, če je db prazna (drugače pride do napake v home page)
     static async seedDefaultNews() {
         console.log("No news found, adding default news...");
         const sampleNews = [

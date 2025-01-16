@@ -39,7 +39,11 @@
                   <p>
                     <%= item.content %>
                   </p>
-                  <small class="text-muted">Objavljeno: <%= item.date %></small>
+                  <small class="text-muted">Objavljeno: <%= new Intl.DateTimeFormat('sl-SI', { year: 'numeric' ,
+                      month: 'long' , day: 'numeric' , hour: '2-digit' , minute: '2-digit' }).format(new
+                      Date(item.date)) %>
+                  </small>
+
                 </li>
                 <% }) %>
             </ul>

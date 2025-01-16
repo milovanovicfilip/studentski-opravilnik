@@ -1,48 +1,53 @@
 <%- include('partials/header') %>
 
-<div class="d-flex">
-  <%- include('partials/sidebar') %>
-  <main>
-    <h1 class="text-center">Dobrodošli, <%= user ? user.username : "Gost" %>!</h1>
-    <p class="text-center">
-      Hitro dostopajte do ključnih funkcionalnosti aplikacije.
-    </p>
+  <div class="d-flex">
+    <%- include('partials/sidebar') %>
+      <main>
+        <h1 class="text-center">Dobrodošli, <%= user ? user.username : "Gost" %>!</h1>
+        <p class="text-center">
+          Hitro dostopajte do ključnih funkcionalnosti aplikacije.
+        </p>
 
-    <section class="quick-links mt-4">
-      <h2>Hitre povezave</h2>
-      <div class="row">
-        <div class="col-md-3">
-          <a href="/tasks" class="btn btn-primary w-100 mb-2">Naloge</a>
-        </div>
-        <div class="col-md-3">
-          <a href="/projects" class="btn btn-secondary w-100 mb-2">Projekti</a>
-        </div>
-        <div class="col-md-3">
-          <a href="/users" class="btn btn-success w-100 mb-2">Uporabniki</a>
-        </div>
-        <div class="col-md-3">
-          <a href="/stats" class="btn btn-info w-100 mb-2">Statistike</a>
-        </div>
-      </div>
-    </section>
+        <section class="quick-links mt-4">
+          <h2>Hitre povezave</h2>
+          <div class="row">
+            <div class="col-md-3">
+              <a href="/tasks" class="btn btn-primary w-100 mb-2">Naloge</a>
+            </div>
+            <div class="col-md-3">
+              <a href="/projects" class="btn btn-secondary w-100 mb-2">Projekti</a>
+            </div>
+            <div class="col-md-3">
+              <a href="/users" class="btn btn-success w-100 mb-2">Uporabniki</a>
+            </div>
+            <div class="col-md-3">
+              <a href="/stats" class="btn btn-info w-100 mb-2">Statistike</a>
+            </div>
+          </div>
+        </section>
 
-    <!-- Novice o aplikaciji -->
-    <section class="news mt-5">
-      <h2>Novice o aplikaciji</h2>
-      <% if (news && news.length > 0) { %>
-        <ul class="list-group">
-          <% news.forEach(item => { %>
-            <li class="list-group-item">
-              <strong><%= item.title %></strong>
-              <p><%= item.content %></p>
-              <small class="text-muted">Objavljeno: <%= item.date %></small>
-            </li>
-          <% }) %>
-        </ul>
-      <% } else { %>
-        <p>Trenutno ni novic. Spremljajte posodobitve!</p>
-      <% } %>
-    </section>  </main>
-</div>
+        <!-- Novice o aplikaciji -->
+        <section class="news mt-5">
+          <h2>Novice o aplikaciji</h2>
+          <% if (news && news.length> 0) { %>
+            <ul class="list-group">
+              <% news.forEach(item=> { %>
+                <li class="list-group-item">
+                  <strong>
+                    <%= item.title %>
+                  </strong>
+                  <p>
+                    <%= item.content %>
+                  </p>
+                  <small class="text-muted">Objavljeno: <%= item.date %></small>
+                </li>
+                <% }) %>
+            </ul>
+            <% } else { %>
+              <p>Trenutno ni novic. Spremljajte posodobitve!</p>
+              <% } %>
+        </section>
+      </main>
+  </div>
 
-<%- include('partials/footer') %>
+  <%- include('partials/footer') %>

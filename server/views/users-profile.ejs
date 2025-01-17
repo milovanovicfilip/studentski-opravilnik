@@ -3,10 +3,54 @@
     <div class="d-flex">
         <%- include('partials/sidebar') %>
             <main>
-                <h2>Profil</h2>
-                <!-- Page-specific content here -->
-                 
+                <div class="user-settings">
+                    <h1>Uporabniške nastavitve</h1>
+                    <form class="settings-form" id="settingsForm">
+                        <!-- Username Field -->
+                        <div class="settings-group">
+                            <label for="username">Uporabniško ime:</label>
+                            <input type="text" id="username" value="Janez Novak" disabled />
+                        </div>
+
+                        <!-- Email Field -->
+                        <div class="settings-group">
+                            <label for="email">E-pošta:</label>
+                            <input type="email" id="email" value="janez.novak@e-posta.si" disabled />
+                        </div>
+
+                        <!-- Avatar Field -->
+                        <div class="settings-group">
+                            <label for="avatar">Avatar:</label>
+                            <div class="settings-avatar">
+                                <img src="/assets/img/profile-img.png" alt="Avatar Preview" />
+                                <input type="text" id="avatar" value="https://www.slike.si/assets/img/profile-img.png"
+                                    placeholder="Vnesite URL za avatar" />
+                            </div>
+                        </div>
+
+                        <!-- Email Notifications -->
+                        <div class="settings-group">
+                            <label>
+                                <input type="checkbox" id="emailNotifications" />
+                                E-poštna sporočila
+                            </label>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="settings-buttons d-flex justify-content-center align-items-center gap-2">
+                            <button type="submit" class="btn-save flex-grow-1">Shrani spremembe</button>
+                            <button type="reset" class="btn-reset flex-grow-1">Ponastavi</button>
+                        </div>
+                    </form>
+                </div>
             </main>
+
+            <script>
+
+            </script>
+
+
     </div>
+
 
     <%- include('partials/footer') %>

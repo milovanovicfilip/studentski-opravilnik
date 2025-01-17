@@ -67,15 +67,24 @@ export default class UserController {
     }
   }
 
-  // Get Current User
   async getCurrentUser(req, res) {
     if (!req.session.user) {
       return res.status(401).json({ error: "Unauthorized" });
     }
-    res.status(200).json(req.session.user);
+
+    try {
+      const user = await User.findById(req.session.user.id).select("-password"); // Exclude password from response
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      res.status(200).json(user);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Server error", details: error.message });
+    }
   }
 
-  // User Logout
   async logoutUser(req, res) {
     req.session.destroy((err) => {
       if (err) {
@@ -86,18 +95,52 @@ export default class UserController {
     });
   }
 
-  updateProfile = async function (request, response) {
+  updateProfile = async function (req, res) {
     try {
-      return response
-        .status(200)
-        .json({ message: "Sucessfully updated profile" });
+      const { username, email, avatarUrl, emailNotifications } = req.body;
+
+      // Check if user is authenticated
+      if (!req.session.user) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      const user = await User.findById(req.session.user.id);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Check for email uniqueness
+      if (email && email !== user.email) {
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+          return res.status(400).json({ error: "Email already in use" });
+        }
+        user.email = email;
+      }
+
+      // Update other fields
+      if (username) user.username = username;
+      if (avatarUrl) user.avatarUrl = avatarUrl;
+      if (emailNotifications !== undefined) user.emailNotifications = emailNotifications;
+
+      await user.save();
+
+      // Update session data with new email
+      req.session.user = {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        avatarUrl: user.avatarUrl,
+        emailNotifications: user.emailNotifications
+      };
+
+      res.status(200).json({ message: "Profile updated successfully", user });
     } catch (error) {
       console.error(error);
-      return response
-        .status(500)
-        .json({ message: "An unexpected error occurred" });
+      return res.status(500).json({ error: "An unexpected error occurred", details: error.message });
     }
   };
+
 
   getUserPosts = async function (request, response) {
     try {

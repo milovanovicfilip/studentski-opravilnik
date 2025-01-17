@@ -26,6 +26,16 @@ const userSchema = new mongoose.Schema({
     tasks: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "Task"
+    }],
+    projects: [{
+        projectId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Project"
+        },
+        role: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Role"
+        }
     }]
 });
 

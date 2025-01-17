@@ -1,10 +1,10 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
 import { User } from "../Models/User.Model.mjs";
 dotenv.config();
 
 export default class UserController {
-  constructor() {}
+  constructor() { }
   async addUser(req, res) {
     const { username, email, password } = req.body;
     if (!username || !email || !password) {

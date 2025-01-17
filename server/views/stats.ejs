@@ -1,0 +1,125 @@
+<script>
+    try {
+        const tasksResponse = await fetch('/tasks');
+        const tasks = await tasksResponse.json();
+
+        const projectsResponse = await fetch('/projects');
+        const projects = await projectsResponse.json();
+
+        const projectSelect = document.getElementById('project');
+        projects.forEach(project => {
+            const option = document.createElement('option');
+            option.value = project._id;
+            option.textContent = project.name;
+            projectSelect.appendChild(option);
+        });
+
+        const completedTasks = tasks.filter(task => task.status === 'completed').length;
+        const inProgressTasks = tasks.filter(task => task.status === 'in-progress').length;
+
+        tasksChart.data.datasets[0].data = [completedTasks, inProgressTasks];
+        tasksChart.update();
+
+    } catch (error) {
+        console.error("Error while downloading data", error);
+    }
+
+</script>
+
+
+
+
+<%- include('partials/header') %>
+
+    <div class="d-flex">
+        <%- include('partials/sidebar') %>
+            <main>
+                <h2>Statistike</h2>
+                <div class="filters mb-3">
+                    <label for="timeframe">Časovni okvir:</label>
+                    <select id="timeframe" class="form-select w-auto d-inline-block">
+                        <option value="week">Zadnji teden</option>
+                        <option value="month">Zadnji mesec</option>
+                        <option value="year">Zadnje leto</option>
+                    </select>
+        
+                    <label for="project" class="ms-3">Projekt:</label>
+                    <select id="project" class="form-select w-auto d-inline-block">
+                        <option value="all">Vsi projekti</option>
+                    </select>
+                </div>
+        
+                <div class="charts row">
+                    <div class="col-md-6">
+                        <h5>Napredek nalog</h5>
+                        <canvas id="progressChart"></canvas>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Zaključene naloge vs. Naloge v teku</h5>
+                        <canvas id="tasksChart"></canvas>
+                    </div>
+                    <div class="col-md-12 mt-4">
+                        <h5>Dodeljene naloge po uporabnikih</h5>
+                        <canvas id="assignmentChart"></canvas>
+                    </div>
+                </div>
+            </main>
+    </div>
+
+    <%- include('partials/footer') %>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    
+    const progressData = {
+        labels: ["Januar", "Februar", "Marec", "April", "Maj", "Junij"],
+        datasets: [{
+            label: "Napredek nalog (%)",
+            data: [20, 40, 60, 70, 80, 100],
+            backgroundColor: "rgba(75, 192, 192, 0.2)",
+            borderColor: "rgba(75, 192, 192, 1)",
+            borderWidth: 1
+        }]
+    };
+
+    const tasksData = {
+        labels: ["Zaključene", "V teku"],
+        datasets: [{
+            data: [50, 25],
+            backgroundColor: ["#4caf50", "#f44336"],
+            hoverOffset: 4
+        }]
+    };
+
+    const assignmentData = {
+        labels: ["Uporabnik 1", "Uporabnik 2", "Uporabnik 3"],
+        datasets: [{
+            data: [10, 20, 15],
+            backgroundColor: ["#2196f3", "#ff9800", "#9c27b0"]
+        }]
+    };
+
+    const progressChart = new Chart(
+        document.getElementById("progressChart"),
+        {
+            type: "line",
+            data: progressData
+        }
+    );
+
+    const tasksChart = new Chart(
+        document.getElementById("tasksChart"),
+        {
+            type: "doughnut",
+            data: tasksData
+        }
+    );
+
+    const assignmentChart = new Chart(
+        document.getElementById("assignmentChart"),
+        {
+            type: "bar",
+            data: assignmentData
+        }
+    );
+</script>

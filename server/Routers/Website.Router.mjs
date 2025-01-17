@@ -1,10 +1,9 @@
 import express from "express";
+import NewsController from "../Controllers/News.Controller.mjs";
 
 const router = express.Router();
 
-router.get("/", (req, res) => {
-  res.render("index", { title: "Študentski opravilnik" });
-});
+router.get("/", NewsController.getNews);
 
 router.get("/list", (req, res) => {
   res.render("list", { title: "Seznam nalog - Študentski opravilnik" });
@@ -20,8 +19,8 @@ router.get("/kanban", (req, res) => {
   res.render("kanban", { title: "Kanban - Študentski opravilnik" });
 });
 
-router.get("/calendar", (req, res) => {
-  res.render("calendar", { title: "Koledar - Študentski opravilnik" });
+router.get('/calendar', (req, res) => {
+  res.render('calendar', { title: 'Koledar - Študentski opravilnik', page: 'calendar' });
 });
 
 router.get("/settings", (req, res) => {

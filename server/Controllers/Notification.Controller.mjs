@@ -1,4 +1,4 @@
-import { Notification } from '../models/Notification.Model.mjs';
+import { Notification } from '../Models/Notification.Model.mjs';
 
 class NotificationController {
 

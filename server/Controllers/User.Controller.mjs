@@ -114,7 +114,7 @@ export default class UserController {
           console.error(err);
           return res.status(500).json({ error: "Failed to log out from all devices" });
         }
-        res.clearCookie("connect.sid"); // Clear session cookie
+        res.clearCookie("connect.sid");
         res.status(200).json({ message: "Logged out from all devices!" });
       });
     } catch (error) {
@@ -137,7 +137,6 @@ export default class UserController {
         return res.status(404).json({ error: "User not found" });
       }
 
-      // Check for email uniqueness
       if (email && email !== user.email) {
         const existingUser = await User.findOne({ email });
         if (existingUser) {
@@ -146,14 +145,13 @@ export default class UserController {
         user.email = email;
       }
 
-      // Update other fields
       if (username) user.username = username;
       if (avatarUrl) user.avatarUrl = avatarUrl;
       if (emailNotifications !== undefined) user.emailNotifications = emailNotifications;
 
       await user.save();
 
-      // Update session data with new email
+      // Update session data
       req.session.user = {
         id: user._id,
         username: user.username,
@@ -183,12 +181,11 @@ export default class UserController {
 
   async getUserData(req, res) {
     try {
-      const user = await User.findById(req.session.user.id).select("-password -__v"); // Exclude password and metadata
+      const user = await User.findById(req.session.user.id).select("-password -__v");
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
 
-      // Convert user data to JSON
       const userData = JSON.stringify(user, null, 2);
 
       // Send as file download

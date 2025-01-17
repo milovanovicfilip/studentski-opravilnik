@@ -1,0 +1,136 @@
+/* Root Variables */
+:root {
+    --color-primary: #006385;
+    --color-secondary: #003B4F;
+    --color-light: #e0f7ff;
+    --color-background: #f4f4f4;
+    --color-white: #ffffff;
+    --color-text-primary: #333;
+    --color-text-secondary: #666;
+    --color-danger: #A13333;
+    --color-secondary-light: #cfe8ff;
+    --font-family: 'Open Sans', sans-serif;
+}
+
+body.dark-mode {
+    --color-background: #333;
+    --color-white: #232323;
+    --color-text-primary: #f4f4f4;
+    --color-text-secondary: #ccc;
+    --color-light: #2c2c2c;
+    --color-form-background: #454545;
+    --color-text-dark: #e0f7ff;
+}
+
+/* Settings Group */
+.settings-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 15px 0;
+}
+
+.settings-group h3 {
+    font-size: 18px;
+    color: var(--color-text-primary);
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+.settings-group label {
+    font-size: 16px;
+    color: var(--color-text-primary);
+    font-weight: bold;
+}
+
+.settings-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    background-color: var(--color-white);
+    cursor: pointer;
+}
+
+/* Session Information Box */
+.settings-group p {
+    background: var(--color-secondary-light);
+    padding: 8px;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 14px;
+    color: var(--color-text-secondary);
+}
+
+/* Buttons */
+.settings-group button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-align: center;
+}
+
+/* Primary Button */
+.btn-secondary {
+    background-color: var(--color-primary);
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: var(--color-secondary);
+}
+
+/* Warning Button (Logout) */
+.btn-warning {
+    background-color: var(--color-primary);
+    color: white;
+}
+
+.btn-warning:hover {
+    background-color: var(--color-secondary);
+}
+
+/* Danger Button (Delete Account) */
+.btn-danger {
+    background-color: var(--color-danger);
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #5E0B25;
+}
+
+/* Dark Mode */
+body.dark-mode .settings-group label {
+    color: var(--color-text-dark);
+}
+
+body.dark-mode .settings-group p {
+    color: var(--color-form-background);
+}
+
+
+body.dark-mode .settings-group input,
+body.dark-mode .settings-group select {
+    background-color: var(--color-form-background);
+    color: var(--color-text-dark);
+    border: 1px solid var(--color-secondary);
+}
+
+body.dark-mode .settings-buttons .btn-primary {
+    background-color: var(--color-primary);
+}
+
+body.dark-mode .settings-buttons .btn-warning {
+    background-color: var(--color-warning);
+}
+
+body.dark-mode .settings-buttons .btn-danger {
+    background-color: var(--color-danger);
+}

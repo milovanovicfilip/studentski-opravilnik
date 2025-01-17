@@ -27,7 +27,7 @@ router.get("/settings", (req, res) => {
   res.render("settings", { title: "Nastavitve - Študentski opravilnik" });
 });
 
-router.get("/users-profile", (req, res) => {
+router.get("/profile", (req, res) => {
   res.render("users-profile", { title: "Profil - Študentski opravilnik" });
 });
 

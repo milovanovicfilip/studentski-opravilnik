@@ -109,7 +109,7 @@ export default class UserController {
         return res.status(404).json({ error: "User not found" });
       }
 
-      // Check for unique email
+      // Check for email uniqueness
       if (email && email !== user.email) {
         const existingUser = await User.findOne({ email });
         if (existingUser) {
@@ -118,14 +118,14 @@ export default class UserController {
         user.email = email;
       }
 
-      // Update fields if provided
+      // Update other fields
       if (username) user.username = username;
       if (avatarUrl) user.avatarUrl = avatarUrl;
       if (emailNotifications !== undefined) user.emailNotifications = emailNotifications;
 
       await user.save();
 
-      // Update session data
+      // Update session data with new email
       req.session.user = {
         id: user._id,
         username: user.username,

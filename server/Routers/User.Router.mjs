@@ -13,6 +13,16 @@ router.post("/logout", userController.logoutUser);
 // Protected routes
 router.get("/getTasks/:id", authoriseUser, userController.getUserPosts);
 router.delete("/:id", authoriseUser, userController.removeUser);
-router.put("/:id", authoriseUser, userController.updateProfile);
+
+router.get("/profile", authoriseUser, async (req, res) => {
+    try {
+        const user = await userController.getUserById(req.session.user.id);
+        res.render("users-profile", { user });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Server error");
+    }
+});
+router.put("/profile", authoriseUser, userController.updateProfile);
 
 export default router;

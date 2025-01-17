@@ -11,12 +11,42 @@
 }
 
 body.dark-mode {
+  --color-primary: #006385;
   --color-background: #333;
-  --color-white: #1a1a1a;
+  --color-dark-blue: #003B4F;
+  --color-white: #232323;
   --color-text-primary: #f4f4f4;
   --color-text-secondary: #ccc;
   --color-light: #2c2c2c;
+  --color-text-dark: #e0f7ff;
 }
+
+/* Set dark mode on html to avoid flicker */
+html[data-theme="dark"] {
+  background-color: #333 !important;
+  color: #f4f4f4 !important;
+}
+
+/* Ensure body inherits the correct colors */
+html[data-theme="dark"] body {
+  background-color: inherit;
+  color: inherit;
+}
+
+/* Disable transition for dark mode toggle during initial load */
+#darkModeToggle,
+#darkModeToggle+.slider,
+#darkModeToggle+.slider::before {
+  transition: none !important;
+}
+
+/* Re-enable transitions after page fully loads */
+html.ready #darkModeToggle,
+html.ready #darkModeToggle+.slider,
+html.ready #darkModeToggle+.slider::before {
+  transition: all 0.3s ease !important;
+}
+
 
 /* General Styles */
 body {
@@ -54,10 +84,23 @@ body.dark-mode .task-item {
   box-shadow: 0 2px 4px rgba(255, 255, 255, 0.05);
 }
 
-body.dark-mode header,
+body.dark-mode header {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+}
+
 body.dark-mode .sidebar {
-  background-color: var(--color-white);
-  color: var(--color-text-primary);
+  background-color: var(--color-dark-blue);
+  color: var(--color-text-dark);
+}
+
+body.dark-mode .sidebar a {
+  color: var(--color-text-dark);
+}
+
+body.dark-mode .sidebar a:hover {
+  background-color: var(--color-light);
+  color: var(--color-text-dark);
 }
 
 body.dark-mode .custom-checkbox {
@@ -76,6 +119,55 @@ body.dark-mode .card {
 body.dark-mode .form-control {
   background-color: var(--color-background);
   color: var(--color-text-primary);
+}
+
+body.dark-mode .nav-icon i {
+  color: var(--color-text-dark);
+}
+
+body.dark-mode .nav-item a {
+  color: var(--color-text-dark);
+}
+
+body.dark-mode .dropdown-menu {
+  background-color: var(--color-dark-blue);
+  border: none;
+}
+
+body.dark-mode .dropdown-header {
+  color: var(--color-text-secondary)
+}
+
+body.dark-mode .dropdown-item {
+  color: var(--color-text-dark);
+}
+
+body.dark-mode .dropdown-item:hover {
+  background-color: var(--color-light);
+  color: var(--color-text-dark);
+}
+
+body.dark-mode header h1 {
+  color: var(--color-text-dark);
+}
+
+body.dark-mode .btn-icon {
+  border: 1px solid var(--color-text-dark);
+  color: var(--color-text-dark);
+}
+
+body.dark-mode .btn-icon:hover {
+  background-color: var(--color-primary);
+  color: var(--color-text-dark);
+  border: 1px solid var(--color-dark-blue);
+}
+
+body.dark-mode .btn-primary {
+  color: var(--color-text-dark)
+}
+
+body.dark-mode .btn-primary:hover {
+  color: var(--color-text-dark)
 }
 
 /* Navigation Styles */
@@ -111,13 +203,14 @@ body.dark-mode .form-control {
 .sidebar {
   height: 100vh;
   background-color: var(--color-white);
+  color: var(--color-dark-blue);
   padding: 20px;
   width: 250px;
   flex-direction: column;
 }
 
 .sidebar a {
-  color: var(--color-text-primary);
+  color: var(--color-dark-blue);
   text-decoration: none;
   padding: 10px 15px;
   display: flex;
@@ -310,51 +403,63 @@ body.dark-mode .form-control {
 }
 
 /* Darkmode Switcher */
-.dark-mode-switch {
-  margin-right: 10px;
+.toggle-switch {
   position: relative;
-  display: inline-block;
+  margin-right: 10px;
   width: 50px;
-  height: 25px;
+  height: 30px;
+  --light: #d8dbe0;
+  --dark: #003B4F;
+  --link: rgb(27, 129, 112);
+  --link-hover: rgb(24, 94, 82);
 }
 
-.dark-mode-switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
+.switch-label {
+  position: absolute;
+  width: 100%;
+  height: 30px;
+  background-color: var(--dark);
+  border-radius: 15px;
+  cursor: pointer;
+  border: 3px solid var(--dark);
+}
+
+.checkbox {
+  position: absolute;
+  display: none;
 }
 
 .slider {
   position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
+  width: 100%;
+  height: 100%;
   border-radius: 25px;
-  transition: 0.4s;
+  transition: 0.3s;
 }
 
-.slider:before {
-  position: absolute;
+.checkbox:checked~.slider {
+  background-color: var(--light);
+}
+
+.slider::before {
   content: "";
-  height: 20px;
-  width: 20px;
-  left: 5px;
-  bottom: 2.5px;
-  background-color: white;
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
-  transition: 0.4s;
+  box-shadow: inset 8px -4px 0px 0px var(--light);
+  background-color: var(--dark);
+  transition: 0.3s;
 }
 
-input:checked+.slider {
-  background-color: var(--color-primary);
+.checkbox:checked~.slider::before {
+  transform: translateX(20px);
+  background-color: var(--dark);
+  box-shadow: none;
 }
 
-input:checked+.slider:before {
-  transform: translateX(25px);
-}
 
 /* Login and Registration Page Styles */
 .container {
@@ -402,4 +507,75 @@ form button[type="submit"] {
   margin: 0 auto;
   display: block;
   width: auto;
+}
+
+/* Dark mode for login and register */
+body.dark-mode .container {
+  background-color: var(--color-background);
+  box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .card {
+  background-color: var(--color-light);
+  box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .card h1 {
+  color: var(--color-text-primary);
+}
+
+body.dark-mode .card a {
+  color: var(--color-text-dark);
+}
+
+body.dark-mode .header-nav .btn-link {
+  color: var(--color-text-primary);
+}
+
+body.dark-mode .header-nav .btn-link:hover {
+  background-color: var(--color-dark-blue);
+  color: var(--color-text-dark);
+}
+
+body.dark-mode form button[type="submit"] {
+  background-color: var(--color-dark-blue);
+  color: var(--color-text-primary);
+}
+
+body.dark-mode form button[type="submit"]:hover {
+  background-color: var(--color-light);
+  color: var(--color-primary);
+}
+
+body.dark-mode .form-label {
+  color: var(--color-text-secondary);
+}
+
+body.dark-mode .text-center p {
+  color: var(--color-text-secondary);
+}
+
+body.dark-mode .text-center a {
+  color: var(--color-text-primary);
+}
+
+body.dark-mode .text-center a:hover {
+  color: var(--color-text-dark);
+}
+
+body.dark-mode .form-control {
+  background-color: var(--color-light);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-text-dark);
+}
+
+body.dark-mode .form-control::placeholder {
+  color: var(--color-text-secondary);
+}
+
+body.dark-mode .form-control:focus {
+  background-color: var(--color-light);
+  color: var(--color-text-primary);
+  border-color: var(--color-white);
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
 }

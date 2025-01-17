@@ -13,10 +13,16 @@
   <!-- Bootstrap Icons -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css"
     rel="stylesheet" />
+  <!-- JavaScript -->
+  <script>
+    if (localStorage.getItem("dark-mode") === "enabled") {
+      document.documentElement.setAttribute("data-theme", "dark");
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="/assets/js/dark-mode.js" defer></script>
   <!-- App CSS -->
   <link rel="stylesheet" href="/assets/css/style.css" />
-  <!-- JavaScript -->
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 
 <body>
@@ -29,10 +35,12 @@
     <nav class="header-nav ms-auto">
       <ul class="d-flex align-items-center list-unstyled mb-0">
         <li class="nav-item">
-          <label class="dark-mode-switch">
-            <input type="checkbox" id="darkModeToggle" />
-            <span class="slider"></span>
-          </label>
+          <div class="toggle-switch">
+            <label class="switch-label">
+              <input type="checkbox" class="checkbox" id="darkModeToggle">
+              <span class="slider"></span>
+            </label>
+          </div>
         </li>
         <li class="nav-item">
           <a class="nav-link nav-icon" href="#"><i class="bi bi-bell"></i></a>
@@ -110,13 +118,6 @@
           );
         }
       });
-  </script>
-  <script>
-    // Dark mode switch
-    const toggle = document.getElementById('darkModeToggle');
-    toggle.addEventListener('change', () => {
-      document.body.classList.toggle('dark-mode');
-    });
   </script>
 </body>
 

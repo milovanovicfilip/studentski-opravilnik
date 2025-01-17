@@ -9,6 +9,7 @@ import { fileURLToPath } from "url";
 import taskRouter from "./Routers/Task.Router.mjs";
 import userRouter from "./Routers/User.Router.mjs";
 import websiteRouter from "./Routers/Website.Router.mjs";
+import notificationRoutes from './Routers/Notification.Router.mjs';
 
 dotenv.config();
 
@@ -66,6 +67,7 @@ app.set("views", path.join(__dirname, "views"));
 app.use("/", websiteRouter);
 app.use("/api/tasks", taskRouter);
 app.use("/api/user", userRouter);
+app.use('/api/notifications', notificationRoutes);
 
 // Health Check Endpoint
 app.get("/api/health", (req, res) => {

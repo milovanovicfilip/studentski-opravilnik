@@ -1,5 +1,5 @@
 import express from 'express';
-import NotificationController from '../controllers/Notification.Controller.mjs';
+import NotificationController from '../Controllers/Notification.Controller.mjs';
 import { authoriseUser } from "../utils/authoriseUser.js";
 
 const router = express.Router();

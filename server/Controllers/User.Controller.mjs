@@ -28,18 +28,20 @@ export default class UserController {
     }
   }
 
-  removeUser = async function (request, response) {
+  async removeUser(req, res) {
     try {
-      return response
-        .status(200)
-        .json({ message: "User deleted successfully" });
+      const userId = req.session.user.id;
+      await User.findByIdAndDelete(userId);
+
+      req.session.destroy();
+      res.clearCookie("connect.sid");
+
+      return res.status(200).json({ message: "User deleted successfully" });
     } catch (error) {
-      console.log(error);
-      return response
-        .status(500)
-        .json({ message: "An unexpected error occurred" });
+      console.error(error);
+      return res.status(500).json({ message: "An unexpected error occurred", error: error.message });
     }
-  };
+  }
 
   async loginUser(req, res) {
     const { email, password } = req.body;
@@ -86,13 +88,39 @@ export default class UserController {
   }
 
   async logoutUser(req, res) {
-    req.session.destroy((err) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ error: "Logout failed" });
+    try {
+      req.session.destroy((err) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).json({ error: "Logout failed" });
+        }
+        res.clearCookie("connect.sid");
+        res.status(200).json({ message: "Logout successful!" });
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "An error occurred during logout" });
+    }
+  }
+
+  async logoutAllSessions(req, res) {
+    try {
+      if (!req.session) {
+        return res.status(400).json({ error: "No active session found" });
       }
-      res.status(200).json({ message: "Logout successful!" });
-    });
+
+      req.session.destroy((err) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).json({ error: "Failed to log out from all devices" });
+        }
+        res.clearCookie("connect.sid");
+        res.status(200).json({ message: "Logged out from all devices!" });
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "An error occurred during logout" });
+    }
   }
 
   updateProfile = async function (req, res) {
@@ -109,7 +137,6 @@ export default class UserController {
         return res.status(404).json({ error: "User not found" });
       }
 
-      // Check for email uniqueness
       if (email && email !== user.email) {
         const existingUser = await User.findOne({ email });
         if (existingUser) {
@@ -118,14 +145,13 @@ export default class UserController {
         user.email = email;
       }
 
-      // Update other fields
       if (username) user.username = username;
       if (avatarUrl) user.avatarUrl = avatarUrl;
       if (emailNotifications !== undefined) user.emailNotifications = emailNotifications;
 
       await user.save();
 
-      // Update session data with new email
+      // Update session data
       req.session.user = {
         id: user._id,
         username: user.username,
@@ -153,14 +179,24 @@ export default class UserController {
     }
   };
 
-  getUserData = async function (request, response) {
+  async getUserData(req, res) {
     try {
-      return response.status(200).json(user);
+      const user = await User.findById(req.session.user.id).select("-password -__v");
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const userData = JSON.stringify(user, null, 2);
+
+      // Send as file download
+      res.setHeader("Content-Disposition", "attachment; filename=user_data.json");
+      res.setHeader("Content-Type", "application/json");
+      res.status(200).send(userData);
     } catch (error) {
-      console.log(error);
-      return response
-        .status(500)
-        .json({ message: "An unexpexted error occurred" });
+      console.error(error);
+      return res.status(500).json({ error: "Failed to retrieve user data", details: error.message });
     }
-  };
+  }
+
+
 }

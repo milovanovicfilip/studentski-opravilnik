@@ -1,5 +1,6 @@
 import express from "express";
 import NewsController from "../Controllers/News.Controller.mjs";
+import { authoriseUser } from "../utils/authoriseUser.js";
 
 const router = express.Router();
 
@@ -23,8 +24,14 @@ router.get('/calendar', (req, res) => {
   res.render('calendar', { title: 'Koledar - Študentski opravilnik', page: 'calendar' });
 });
 
-router.get("/settings", (req, res) => {
-  res.render("settings", { title: "Nastavitve - Študentski opravilnik" });
+router.get("/settings", authoriseUser, async (req, res) => {
+  res.render("settings", {
+    title: "Nastavitve - Študentski opravilnik",
+    user: req.session.user,
+    sessionID: req.sessionID,
+    userIP: req.ip,
+    lastLogin: req.session.lastLogin || "Ni podatkov"
+  });
 });
 
 router.get("/profile", (req, res) => {

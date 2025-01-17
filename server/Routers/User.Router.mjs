@@ -9,10 +9,11 @@ router.post("/register", userController.addUser);
 router.post("/login", userController.loginUser);
 router.get("/current", userController.getCurrentUser);
 router.post("/logout", userController.logoutUser);
+router.post("/logout-all", authoriseUser, userController.logoutAllSessions);
 
 // Protected routes
 router.get("/getTasks/:id", authoriseUser, userController.getUserPosts);
-router.delete("/:id", authoriseUser, userController.removeUser);
+router.delete("/", authoriseUser, userController.removeUser);
 
 router.get("/profile", authoriseUser, async (req, res) => {
     try {
@@ -24,5 +25,6 @@ router.get("/profile", authoriseUser, async (req, res) => {
     }
 });
 router.put("/profile", authoriseUser, userController.updateProfile);
+router.get("/data", authoriseUser, userController.getUserData);
 
 export default router;

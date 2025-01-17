@@ -1,0 +1,190 @@
+/* Root Variables */
+:root {
+    --color-primary: #006385;
+    --color-secondary: #003B4F;
+    --color-light: #e0f7ff;
+    --color-background: #f4f4f4;
+    --color-white: #ffffff;
+    --color-text-primary: #333;
+    --color-text-secondary: #666;
+    --font-family: 'Open Sans', sans-serif;
+}
+
+body.dark-mode {
+    --color-primary: #006385;
+    --color-background: #333;
+    --color-dark-blue: #003B4F;
+    --color-white: #232323;
+    --color-text-primary: #f4f4f4;
+    --color-text-secondary: #ccc;
+    --color-light: #2c2c2c;
+    --color-form-background: #454545;
+    --color-text-dark: #e0f7ff;
+}
+
+.user-settings {
+    background-color: #f9fdff;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px auto;
+    max-width: 600px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.user-settings h1 {
+    font-size: 28px;
+    color: #003B4F;
+    text-align: center;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #e0f7ff;
+    padding-bottom: 10px;
+}
+
+.settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.settings-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.settings-group label {
+    font-size: 16px;
+    color: #333;
+    font-weight: bold;
+}
+
+.settings-group input[type="text"],
+.settings-group input[type="email"],
+.settings-group input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    background-color: white;
+}
+
+.settings-group input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.settings-avatar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.settings-avatar img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 2px solid #006385;
+}
+
+.settings-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.btn-save {
+    background-color: #006385;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.btn-save:hover {
+    background-color: #003B4F;
+}
+
+.btn-reset {
+    background-color: transparent;
+    color: #006385;
+    padding: 10px 20px;
+    border: 2px solid #006385;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.btn-reset:hover {
+    background-color: #e0f7ff;
+    color: #003B4F;
+}
+
+/* Dark Mode */
+body.dark-mode .user-settings {
+    background-color: #232323 !important;
+    color: var(--color-white) !important;
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 600px;
+    box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .user-settings h1 {
+    color: var(--color-text-dark) !important;
+    border-bottom: 2px solid var(--color-light) !important;
+}
+
+body.dark-mode .settings-group label {
+    color: var(--color-text-secondary) !important;
+}
+
+body.dark-mode .settings-group input {
+    background-color: var(--color-form-background) !important;
+    color: var(--color-text-dark) !important;
+    border: 1px solid var(--color-dark-blue) !important;
+}
+
+body.dark-mode .settings-group input::placeholder {
+    color: var(--color-text-dark) !important;
+}
+
+body.dark-mode .settings-group input:disabled {
+    background-color: var(--color-form-background) !important;
+    color: var(--color-text-dark) !important;
+    opacity: 0.8;
+}
+
+body.dark-mode .settings-avatar img {
+    border: 2px solid var(--color-primary) !important;
+}
+
+body.dark-mode .btn-save {
+    background-color: var(--color-primary) !important;
+    color: var(--color-white) !important;
+}
+
+body.dark-mode .btn-save:hover {
+    color: var(--color-text-dark) !important;
+    background-color: var(--color-secondary) !important;
+}
+
+body.dark-mode .btn-reset {
+    background-color: transparent !important;
+    color: var(--color-primary) !important;
+    border: 2px solid var(--color-primary) !important;
+}
+
+body.dark-mode .btn-reset:hover {
+    background-color: var(--color-light) !important;
+    color: var(--color-text-dark) !important;
+}

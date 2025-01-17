@@ -3,10 +3,13 @@ import express from "express";
 import path from "path";
 import cors from "cors";
 import mongoose from "mongoose";
-import { Task } from './Models/Task.Model.mjs'
+import session from "express-session";
+import MongoStore from "connect-mongo";
 import { fileURLToPath } from "url";
-import taskRouter from "./Routes/Task.Router.mjs";
-import userRouter from "./Routes/User.Router.mjs"
+import taskRouter from "./Routers/Task.Router.mjs";
+import userRouter from "./Routers/User.Router.mjs";
+import websiteRouter from "./Routers/Website.Router.mjs";
+import notificationRoutes from './Routers/Notification.Router.mjs';
 
 dotenv.config();
 
@@ -14,32 +17,57 @@ const app = express();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 4000;
 
+// MongoDB Connection
 mongoose
   .connect(process.env.DB_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
-  .then(() => {
-    console.log("Connected to MongoDB Atlas");
-  })
-  .catch((err) => {
-    console.error("Failed to connect to MongoDB Atlas:", err.message);
-  });
+  .then(() => console.log("Connected to MongoDB Atlas"))
+  .catch((err) =>
+    console.error("Failed to connect to MongoDB Atlas:", err.message)
+  );
 
+// Session Middleware
 app.use(
-  cors({
-    origin: ["http://localhost:8080", "https://localhost:5500"],
+  session({
+    secret: process.env.SESSION_SECRET, // Store this in .env
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.DB_URL,
+      ttl: 24 * 60 * 60, // 1 day session expiry
+    }),
+    cookie: {
+      secure: false, // Set to true if using HTTPS
+      httpOnly: true,
+    },
   })
 );
 
+// Middleware
+app.use(cors({ origin: ["http://localhost:8080"], credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(express.static(path.join(__dirname, "..", "client", "public")));
+// Middleware to pass session user to views
+app.use((req, res, next) => {
+  res.locals.user = req.session.user || null;
+  next();
+});
 
+// Static files
+app.use(express.static(path.join(__dirname, "../client/public")));
+
+// EJS setup
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+
+// Routers
+app.use("/", websiteRouter);
 app.use("/api/tasks", taskRouter);
-app.use("api/user", userRouter)
-
+app.use("/api/user", userRouter);
+app.use('/api/notifications', notificationRoutes);
 
 // Health Check Endpoint
 app.get("/api/health", (req, res) => {
@@ -51,23 +79,7 @@ app.get("/api/health", (req, res) => {
     dbConnection: states[dbState] || "Unknown",
   });
 });
-const newTask = new Task({
-  title: "Dokončaj projekt",
-  content: "Dokončati moram nalogo za šolo do konca tedna.",
-  status: "in-progress",
-  priority: "high",
-  dueDate: new Date("2024-11-25"),
-  tags: ["šola", "projekt"],
-});
 
-// Shrani dokument v bazo
-const savedTask = await newTask.save();
-console.log("Vzorec je bil uspešno vnešen:", savedTask);
-app.get("*", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "..", "client", "public", "index.html"));
-});
-
-
-app.listen(PORT, () => {
-  console.log(`Server listening on http://localhost:${PORT} ...`);
-});
+app.listen(PORT, () =>
+  console.log(`Server running at http://localhost:${PORT}`)
+);

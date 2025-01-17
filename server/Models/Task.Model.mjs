@@ -8,7 +8,6 @@ const taskSchema = new mongoose.Schema({
   },
   content: {
     type: String,
-    //required: true,
   },
   status: {
     type: String,
@@ -23,6 +22,13 @@ const taskSchema = new mongoose.Schema({
   dueDate: {
     type: Date,
   },
+  warning: {
+    type: Boolean, default: false
+  },
+  overdue: {
+    type: Boolean,
+    default: false
+  },
   createdAt: {
     type: Date,
     default: Date.now,
@@ -33,6 +39,10 @@ const taskSchema = new mongoose.Schema({
       trim: true,
     },
   ],
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }
 });
 
 export const Task = mongoose.model("Task", taskSchema);

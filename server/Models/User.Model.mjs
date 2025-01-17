@@ -23,12 +23,24 @@ const userSchema = new mongoose.Schema({
         type: String,
         match: [/^https?:\/\/.+\..+/, "Neveljaven URL format."],
     },
+    emailNotifications: {
+        type: Boolean,
+        default: false
+    },
     tasks: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "Task"
+    }],
+    projects: [{
+        projectId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Project"
+        },
+        role: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Role"
+        }
     }]
 });
 
-const User = mongoose.model("User", userSchema);
-
-export default User;
+export const User = mongoose.model("User", userSchema);

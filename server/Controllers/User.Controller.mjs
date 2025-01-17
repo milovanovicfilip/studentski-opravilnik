@@ -1,136 +1,234 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
-import { User } from "../Models/User.Model.js";
+import { User } from "../Models/User.Model.mjs";
+import NotificationController from '../Controllers/Notification.Controller.mjs';
 dotenv.config();
 
-/*import crypto from "crypto";
-function generateRandom(length){
-    let result = '';
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    const charactersLength = characters.length;
-    for ( var i = 0; i < length; i++ ) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-    return result;
-}
-
-function Hash(data, salt){
-    const pepper = process.env.PEPPER;
-    let cypher = data + salt;
-
-    for (let i = 0; i < 1000; i++) {
-        cypher = crypto.createHash('sha512', pepper).update(cypher).digest('base64');
+export default class UserController {
+  constructor() { }
+  async addUser(req, res) {
+    const { username, email, password } = req.body;
+    if (!username || !email || !password) {
+      return res.status(400).json({ error: "All fields are required!" });
     }
 
-    return cypher;
-}*/
+    try {
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        return res.status(400).json({ error: "User already exists!" });
+      }
 
-export default class UserController{
-    constructor(){}
-    async addUser(request, response) {
-        const { username, email, password } = request.body;
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const newUser = new User({ username, email, password: hashedPassword });
+      await newUser.save();
 
-        if (!username || !email || !password) {
-            return response.status(400).json({ error: "Vsa polja so obvezna!" });
-        }
+      res.status(201).json({ message: "User registered successfully!" });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Server error", details: error.message });
+    }
+  }
 
-        try {
-            const existingUser = await User.findOne({ email });
-            if (existingUser) {
-                return res.status(400).json({ error: "Uporabnik že obstaja!" });
-            }
+  async removeUser(req, res) {
+    try {
+      const userId = req.session.user.id;
+      await User.findByIdAndDelete(userId);
 
-            // hash gesla
-            const hashedPassword = await bcrypt.hash(password, 10);
+      req.session.destroy();
+      res.clearCookie("connect.sid");
 
-            const newUser = new User({
-                username,
-                email,
-                password: hashedPassword,
-            });
+      return res.status(200).json({ message: "User deleted successfully" });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+    }
+  }
 
-            // shrani uporabnika v bazo
-            await newUser.save();
-
-            return response.status(201).json({ message: "Registracija uspešna", token: genJWT(user.id) });
-        } catch (error) {
-            console.log(error);
-            return response.status(500).json({ error: "Napaka na strežniku", details: error.message });
-        }
+  async loginUser(req, res) {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ error: "All fields are required!" });
     }
 
-    addUser = async function (request, response) {
-        try{
+    try {
+      const user = await User.findOne({ email });
+      if (!user || !(await bcrypt.compare(password, user.password))) {
+        return res.status(400).json({ error: "Invalid email or password" });
+      }
 
-            return response.status(200).json({message: "User created successfully", token: genJWT(user.id)});
-        }
-        catch(error){
-            console.log(error);
-            return response.status(500).json({message: 'An unexpected error occurred'});
-        }
+      // Set user session
+      req.session.user = {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+      };
+
+      await NotificationController.createNotification(
+        req.session.user.id,
+        "Nova prijava",
+        `Uspešno ste se prijavili v svoj račun.`
+      );
+
+      res.status(200).json({ message: "Login successful!" });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Server error", details: error.message });
+    }
+  }
+
+  async getCurrentUser(req, res) {
+    if (!req.session.user) {
+      return res.status(401).json({ error: "Unauthorized" });
     }
 
-    removeUser = async function (request, response) {
-        try {
-    
-            return response.status(200).json({message: "User deleted successfully"});
-        } catch(error) {
-            console.log(error);
-            return response.status(500).json({message: "An unexpected error occurred"});
-        }
+    try {
+      const user = await User.findById(req.session.user.id).select("-password"); // Exclude password from response
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      res.status(200).json(user);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Server error", details: error.message });
     }
+  }
 
-    loginUser = async function (request,response) {
-        try {
-            
+  async logoutUser(req, res) {
+    try {
 
-            return response.status(200).json({message:"User sucessfully logged in", token: genJWT()});
-        } catch(error) {
-            console.error(error);
-            return response.status(500).json({message: "An unexpected error occurred"});
+      await NotificationController.createNotification(
+        req.session.user.id,
+        "Izpis iz računa",
+        "Uspešno ste se izpisali iz računa."
+      );
+
+      req.session.destroy((err) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).json({ error: "Logout failed" });
         }
+        res.clearCookie("connect.sid");
+        res.status(200).json({ message: "Logout successful!" });
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "An error occurred during logout" });
     }
+  }
 
-    logoutUser = async function (request,response) {
-        try {
-        
-            return response.status(200).json({message:"User sucessfully logged out"});
-        } catch (error) {
-            console.error(error);
-            return response.status(500).json({message: "An unexpected error occurred"});
+  async logoutAllSessions(req, res) {
+    try {
+      if (!req.session) {
+        return res.status(400).json({ error: "No active session found" });
+      }
+
+      await NotificationController.createNotification(
+        req.session.user.id,
+        "Izpis iz računa",
+        "Uspešno ste se izpisali iz vseh naprav."
+      );
+
+      req.session.destroy((err) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).json({ error: "Failed to log out from all devices" });
         }
+        res.clearCookie("connect.sid");
+        res.status(200).json({ message: "Logged out from all devices!" });
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "An error occurred during logout" });
     }
+  }
 
-    updateProfile = async function (request,response) {
-        try {
-            
+  updateProfile = async function (req, res) {
+    try {
+      const { username, email, avatarUrl, emailNotifications } = req.body;
 
-            return response.status(200).json({message: "Sucessfully updated profile"});
-        } catch(error) {
-            console.error(error);
-            return response.status(500).json({message: "An unexpected error occurred"});
+      if (!req.session.user) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      const user = await User.findById(req.session.user.id);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      if (email && email !== user.email) {
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+          return res.status(400).json({ error: "Email already in use" });
         }
+        user.email = email;
+      }
+
+      if (username) user.username = username;
+      if (avatarUrl) user.avatarUrl = avatarUrl;
+      if (emailNotifications !== undefined) user.emailNotifications = emailNotifications;
+
+      await user.save();
+
+      // Update session data
+      req.session.user = {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        avatarUrl: user.avatarUrl,
+        emailNotifications: user.emailNotifications
+      };
+
+      await NotificationController.createNotification(
+        req.session.user.id,
+        "Posodobitev profila",
+        "Uspešno ste posodobili podatke uporabniškega profila."
+      );
+
+      res.status(200).json({ message: "Profile updated successfully", user });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "An unexpected error occurred", details: error.message });
     }
+  };
 
-    getUserPosts = async function (request,response) {
-        try{
-           
-            return response.status(200).json(posts);
-        }
-        catch(error){
-            console.log(error);
-            return response.status(500).json({message: 'An unexpexted error occurred'});
-        }
-    }
 
-    getUserData = async function (request,response) {
-        try{
-            
-            return response.status(200).json(user);
-        }
-        catch(error){
-            console.log(error);
-            return response.status(500).json({message: 'An unexpexted error occurred'});
-        }
+  getUserPosts = async function (request, response) {
+    try {
+      return response.status(200).json(posts);
+    } catch (error) {
+      console.log(error);
+      return response
+        .status(500)
+        .json({ message: "An unexpexted error occurred" });
     }
+  };
+
+  async getUserData(req, res) {
+    try {
+      const user = await User.findById(req.session.user.id).select("-password -__v");
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const userData = JSON.stringify(user, null, 2);
+
+      // Send as file download
+      res.setHeader("Content-Disposition", "attachment; filename=user_data.json");
+      res.setHeader("Content-Type", "application/json");
+
+      await NotificationController.createNotification(
+        req.session.user.id,
+        "Prenos podatkov",
+        "Uspešno ste prenesli osebne podatke uporabniškega računa."
+      );
+
+      res.status(200).send(userData);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "Failed to retrieve user data", details: error.message });
+    }
+  }
+
+
 }

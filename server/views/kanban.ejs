@@ -1,0 +1,38 @@
+<%- include('partials/header') %>
+
+<div class="d-flex">
+  <%- include('partials/sidebar') %>
+  <main>
+    <h2>Kanban</h2>
+    <div class="kanban-container">
+     
+      <div class="kanban-column" id="todo">
+        <h3>To Do</h3>
+        <div class="kanban-cards">
+          <div class="kanban-card" draggable="true" data-id="1">
+            <h4>Task 1</h4>
+            <p>Opis naloge</p>
+          </div>
+          <div class="kanban-card" draggable="true" data-id="2">
+            <h4>Task 2</h4>
+            <p>Opis naloge</p>
+          </div>
+        </div>
+      </div>
+      <div class="kanban-column" id="in-progress">
+        <h3>In Progress</h3>
+        <div class="kanban-cards">
+         
+        </div>
+      </div>
+      <div class="kanban-column" id="done">
+        <h3>Done</h3>
+        <div class="kanban-cards">
+         
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<%- include('partials/footer') %>

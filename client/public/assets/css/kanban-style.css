@@ -1,0 +1,29 @@
+.kanban-container {
+    display: flex;
+    gap: 20px;
+  }
+
+  .kanban-column {
+    flex: 1;
+    background: #f4f4f4;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+
+  .kanban-cards {
+    min-height: 200px;
+  }
+
+  .kanban-card {
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+    cursor: grab;
+  }
+
+  .kanban-card:active {
+    cursor: grabbing;
+  }

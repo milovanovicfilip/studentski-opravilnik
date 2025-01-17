@@ -1,0 +1,133 @@
+<%- include('partials/header') %>
+
+    <div class="d-flex">
+        <%- include('partials/sidebar') %>
+            <main>
+                <div class="user-settings">
+                    <h1>Nastavitve</h1>
+
+                    <!-- Session Information -->
+                    <div class="settings-group">
+                        <label>Trenutna seja</label>
+                        <p><strong>ID seje:</strong>
+                            <%= sessionID %>
+                        </p>
+                        <p><strong>IP naslov:</strong>
+                            <%= userIP %>
+                        </p>
+                        <p><strong>Zadnja prijava:</strong>
+                            <%= lastLogin %>
+                        </p>
+
+                        <button id="logoutCurrent" class="btn-warning">Odjava (Trenutna naprava)</button>
+                        <button id="logoutAll" class="btn-danger">Odjava iz vseh naprav</button>
+                    </div>
+
+                    <!-- Language Selection -->
+                    <div class="settings-group">
+                        <label for="language">Jezik</label>
+                        <select id="language">
+                            <option value="en">English</option>
+                            <option value="sl">Slovenščina</option>
+                            <option value="de">Deutsch</option>
+                        </select>
+                    </div>
+
+                    <!-- Download User Data -->
+                    <div class="settings-group">
+                        <label>Uporabniški račun</label>
+                        <button id="downloadData" class="btn-secondary">Prenesi moje podatke</button>
+                    </div>
+
+                    <!-- Delete Account -->
+                    <div class="settings-group">
+                        <button id="deleteAccount" class="btn-danger">Izbriši račun</button>
+                    </div>
+                </div>
+            </main>
+
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    const languageSelect = document.getElementById("language");
+                    const deleteAccountBtn = document.getElementById("deleteAccount");
+                    const downloadDataBtn = document.getElementById("downloadData");
+                    const logoutCurrentBtn = document.getElementById("logoutCurrent");
+                    const logoutAllBtn = document.getElementById("logoutAll");
+
+                    // Language (Placeholder)
+                    languageSelect.addEventListener("change", function () {
+                        alert("Jezik spremenjen v: " + languageSelect.value);
+                    });
+
+                    // Delete Account with Confirmation
+                    deleteAccountBtn.addEventListener("click", async function () {
+                        if (confirm("Ali ste prepričani, da želite izbrisati račun?")) {
+                            const response = await fetch("/api/user", { method: "DELETE", credentials: "include" });
+                            const data = await response.json();
+                            if (response.ok) {
+                                alert("Račun uspešno izbrisan.");
+                                window.location.href = "/login";
+                            } else {
+                                alert("Napaka: " + data.error);
+                            }
+                        }
+                    });
+
+                    // Download User Data
+                    downloadDataBtn.addEventListener("click", async function () {
+                        const response = await fetch("/api/user/data", {
+                            method: "GET",
+                            credentials: "include"
+                        });
+
+                        if (!response.ok) {
+                            alert("Napaka pri prenosu podatkov.");
+                            return;
+                        }
+
+                        const blob = await response.blob();
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement("a");
+                        a.href = url;
+                        a.download = "user_data.json";
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                    });
+
+                    // Logout Current Session
+                    logoutCurrentBtn.addEventListener("click", async function () {
+                        const response = await fetch("/api/user/logout", {
+                            method: "POST",
+                            credentials: "include"
+                        });
+
+                        const data = await response.json();
+                        if (response.ok) {
+                            alert("Odjavljeni ste.");
+                            window.location.href = "/login"; // Redirect to login
+                        } else {
+                            alert("Napaka: " + data.error);
+                        }
+                    });
+
+                    // Logout from All Devices
+                    logoutAllBtn.addEventListener("click", async function () {
+                        const response = await fetch("/api/user/logout-all", {
+                            method: "POST",
+                            credentials: "include"
+                        });
+
+                        const data = await response.json();
+                        if (response.ok) {
+                            alert("Odjavljeni iz vseh naprav.");
+                            window.location.href = "/login"; // Redirect to login
+                        } else {
+                            alert("Napaka: " + data.error);
+                        }
+                    });
+                });
+            </script>
+    </div>
+
+    <%- include('partials/footer') %>

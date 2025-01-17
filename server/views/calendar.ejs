@@ -1,0 +1,36 @@
+<%- include('partials/header') %>
+
+    <div class="d-flex">
+        <%- include('partials/sidebar') %>
+            <main>
+                <h2>Koledar</h2>
+                <div id="calendar"></div>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', () => {
+                        const calendarEl = document.getElementById('calendar');
+                        const calendar = new FullCalendar.Calendar(calendarEl, {
+                            initialView: 'dayGridMonth',
+                            headerToolbar: {
+                                left: 'prev,next today', // Fixed typo
+                                center: 'title',
+                                right: 'dayGridMonth,timeGridWeek,timeGridDay',
+                            },
+                            events: async (fetchInfo, successCallback, failureCallback) => {
+                                try {
+                                    const response = await fetch('/api/tasks');
+                                    const tasks = await response.json(); // Fixed `.join()` to `.json()`
+                                    successCallback(tasks);
+                                } catch (error) {
+                                    console.error('Napaka pri nalaganju opravil: ', error);
+                                    failureCallback(error);
+                                }
+                            },
+                        });
+                        calendar.render();
+                    });
+                </script>
+            </main>
+    </div>
+
+    <%- include('partials/footer') %>

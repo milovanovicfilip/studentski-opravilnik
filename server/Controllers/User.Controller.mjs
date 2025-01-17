@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
 import { User } from "../Models/User.Model.mjs";
+import NotificationController from '../Controllers/Notification.Controller.mjs';
 dotenv.config();
 
 export default class UserController {
@@ -62,6 +63,12 @@ export default class UserController {
         email: user.email,
       };
 
+      await NotificationController.createNotification(
+        req.session.user.id,
+        "Nova prijava",
+        `Uspešno ste se prijavili v svoj račun.`
+      );
+
       res.status(200).json({ message: "Login successful!" });
     } catch (error) {
       console.error(error);
@@ -89,6 +96,13 @@ export default class UserController {
 
   async logoutUser(req, res) {
     try {
+
+      await NotificationController.createNotification(
+        req.session.user.id,
+        "Izpis iz računa",
+        "Uspešno ste se izpisali iz računa."
+      );
+
       req.session.destroy((err) => {
         if (err) {
           console.error(err);
@@ -109,6 +123,12 @@ export default class UserController {
         return res.status(400).json({ error: "No active session found" });
       }
 
+      await NotificationController.createNotification(
+        req.session.user.id,
+        "Izpis iz računa",
+        "Uspešno ste se izpisali iz vseh naprav."
+      );
+
       req.session.destroy((err) => {
         if (err) {
           console.error(err);
@@ -127,7 +147,6 @@ export default class UserController {
     try {
       const { username, email, avatarUrl, emailNotifications } = req.body;
 
-      // Check if user is authenticated
       if (!req.session.user) {
         return res.status(401).json({ error: "Unauthorized" });
       }
@@ -160,6 +179,12 @@ export default class UserController {
         emailNotifications: user.emailNotifications
       };
 
+      await NotificationController.createNotification(
+        req.session.user.id,
+        "Posodobitev profila",
+        "Uspešno ste posodobili podatke uporabniškega profila."
+      );
+
       res.status(200).json({ message: "Profile updated successfully", user });
     } catch (error) {
       console.error(error);
@@ -191,6 +216,13 @@ export default class UserController {
       // Send as file download
       res.setHeader("Content-Disposition", "attachment; filename=user_data.json");
       res.setHeader("Content-Type", "application/json");
+
+      await NotificationController.createNotification(
+        req.session.user.id,
+        "Prenos podatkov",
+        "Uspešno ste prenesli osebne podatke uporabniškega računa."
+      );
+
       res.status(200).send(userData);
     } catch (error) {
       console.error(error);

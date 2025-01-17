@@ -22,6 +22,8 @@
   </script>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="/assets/js/dark-mode.js" defer></script>
+  <script src="/assets/js/notifications.js" defer></script>
+
   <!-- App CSS -->
   <link rel="stylesheet" href="/assets/css/style.css">
   <link rel="stylesheet" href="/assets/css/kanban-style.css">
@@ -53,8 +55,28 @@
             </label>
           </div>
         </li>
-        <li class="nav-item">
-          <a class="nav-link nav-icon" href="#"><i class="bi bi-bell"></i></a>
+        <li class="nav-item dropdown">
+          <a class="nav-link nav-icon" href="#" id="notificationsDropdown" data-bs-toggle="dropdown">
+            <i class="bi bi-bell"></i>
+            <span id="notification-count" class="badge bg-danger rounded-pill" style="display: none;">0</span>
+          </a>
+          <ul id="notifications-list" class="dropdown-menu dropdown-menu-end p-2" style="width: 300px;">
+            <li class="dropdown-header">
+              <h6>Obvestila</h6>
+            </li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+            <li id="notification-items"><!-- Notifications here --></li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+            <li class="text-center">
+              <button id="mark-all-read" class="btn btn-reset">
+                <i class="bi bi-envelope-open"></i> Označi vse kot prebrano
+              </button>
+            </li>
+          </ul>
         </li>
         <li class="nav-item dropdown pe-3">
           <a class="nav-link nav-profile d-flex align-items-center" href="#" data-bs-toggle="dropdown">

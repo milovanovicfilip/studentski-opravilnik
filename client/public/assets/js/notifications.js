@@ -27,14 +27,14 @@ document.addEventListener("DOMContentLoaded", () => {
                     const li = document.createElement("li");
                     li.classList.add("dropdown-item", "d-flex", "align-items-start");
                     li.innerHTML = `
-                        <div class="me-2">
-                            <i class="bi ${notif.read ? 'bi-check-circle' : 'bi-exclamation-circle'}"></i>
-                        </div>
-                        <div>
-                            <strong>${notif.title}</strong><br>
-                            <small>${notif.description}</small>
-                        </div>
-                    `;
+                    <div class="notification-item">
+                      <i class="bi ${notif.read ? 'bi-check-circle' : 'bi-exclamation-circle text-danger'}"></i>
+                      <div class="notification-text">
+                        <strong>${notif.title}</strong><br>
+                        <small>${notif.description}</small>
+                      </div>
+                    </div>
+                  `;
 
                     if (!notif.read) li.style.fontWeight = "bold"; // Highlight unread notifications
 

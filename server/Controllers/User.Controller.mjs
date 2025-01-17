@@ -96,6 +96,13 @@ export default class UserController {
 
   async logoutUser(req, res) {
     try {
+
+      await NotificationController.createNotification(
+        req.session.user.id,
+        "Izpis iz računa",
+        "Uspešno ste se izpisali iz računa."
+      );
+
       req.session.destroy((err) => {
         if (err) {
           console.error(err);
@@ -115,6 +122,12 @@ export default class UserController {
       if (!req.session) {
         return res.status(400).json({ error: "No active session found" });
       }
+
+      await NotificationController.createNotification(
+        req.session.user.id,
+        "Izpis iz računa",
+        "Uspešno ste se izpisali iz vseh naprav."
+      );
 
       req.session.destroy((err) => {
         if (err) {

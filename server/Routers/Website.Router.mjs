@@ -24,6 +24,10 @@ router.get('/calendar', (req, res) => {
   res.render('calendar', { title: 'Koledar - Študentski opravilnik', page: 'calendar' });
 });
 
+router.get('/stats', (req, res) => {
+  res.render('stats', { title: 'Statistike - Študentski opravilnik', page: 'stats' });
+});
+
 router.get("/settings", authoriseUser, async (req, res) => {
   res.render("settings", {
     title: "Nastavitve - Študentski opravilnik",

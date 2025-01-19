@@ -1,4 +1,8 @@
+<!-- project.ejs -->
 <%- include('partials/header') %>
+
+<!-- Ensure Axios is included -->
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 <div class="d-flex">
   <%- include('partials/sidebar') %>
@@ -58,8 +62,9 @@
 <script>
   axios.defaults.withCredentials = true;
 
-  const projectId = "<%= project.id %>"; // Get project ID from server
-  const taskBaseUrl = `http://localhost:${PORT}/api/tasks?project=${projectId}`; // Adjust PORT if necessary
+  // Use both 'project.id' and 'project._id' with a fallback
+  const projectId = "<%= project.id || project._id %>";
+  const taskBaseUrl = `/api/tasks?project=${projectId}`; // Use relative URL
 
   function toggleForm() {
     const form = document.getElementById("taskForm");
@@ -88,7 +93,13 @@
         return;
       }
 
-      tasks.forEach((task) => {
+      tasks.forEach((task, index) => {
+        console.log(`Task ${index + 1} ID:`, task.id);
+        console.log(`Task ${index + 1} _id:`, task._id);
+
+        // Use 'id' if available; otherwise, fallback to '_id'
+        const taskId = task.id || task._id;
+
         const dueDate = new Date(task.dueDate);
         const now = new Date();
         const isOverdue = dueDate < now && task.status !== "completed";
@@ -110,7 +121,7 @@
                 <label class="custom-checkbox me-3">
                   <input type="checkbox" ${
                     task.status === "completed" ? "checked" : ""
-                  } onclick="toggleTaskStatus('${task.id}', this.checked)">
+                  } onclick="toggleTaskStatus('${taskId}', this.checked)">
                   <i class="bi bi-check"></i>
                 </label>
                 <div class="task-details">
@@ -131,12 +142,10 @@
                 </div>
               </div>
               <div class="task-actions">
-                <button class="btn btn-icon me-2" onclick="populateEditForm('${
-                  task.id
-                }')">
+                <button class="btn btn-icon me-2" onclick="populateEditForm('${taskId}')">
                   <i class="bi bi-pencil-square"></i>
                 </button>
-                <button class="btn btn-icon" onclick="deleteTask('${task.id}')">
+                <button class="btn btn-icon" onclick="deleteTask('${taskId}')">
                   <i class="bi bi-trash"></i>
                 </button>
               </div>
@@ -164,7 +173,7 @@
   async function toggleTaskStatus(taskId, isChecked) {
     try {
       const status = isChecked ? "completed" : "pending";
-      await axios.put(`http://localhost:${PORT}/api/tasks/${taskId}`, {
+      await axios.put(`/api/tasks/${taskId}`, {
         status,
       });
       loadTasks();
@@ -178,12 +187,10 @@
 
   async function populateEditForm(taskId) {
     try {
-      const response = await axios.get(
-        `http://localhost:${PORT}/api/tasks/${taskId}`
-      );
+      const response = await axios.get(`/api/tasks/${taskId}`);
       const task = response.data;
 
-      document.getElementById("taskId").value = task.id;
+      document.getElementById("taskId").value = task.id || task._id;
       document.getElementById("taskName").value = task.title;
       document.getElementById("taskDate").value = task.dueDate.split("T")[0];
       document.getElementById("taskPriority").value = task.priority;
@@ -219,18 +226,12 @@
 
     try {
       if (taskId) {
-        await axios.put(
-          `http://localhost:${PORT}/api/tasks/${taskId}`,
-          taskData
-        );
+        await axios.put(`/api/tasks/${taskId}`, taskData);
       } else {
-        const response = await axios.post(
-          "http://localhost:${PORT}/api/tasks",
-          taskData
-        );
-        const newTaskId = response.data.id;
+        const response = await axios.post("/api/tasks", taskData);
+        const newTaskId = response.data.id || response.data._id;
         // Optionally, add the task to the project
-        await axios.post("http://localhost:${PORT}/api/projects/add-task", {
+        await axios.post("/api/projects/add-task", {
           projectId,
           taskId: newTaskId,
         });
@@ -243,7 +244,7 @@
         "Failed to save task:",
         error.response?.data || error.message
       );
-      alert("Pri shranjevanju naloge je prišlo do napake.");
+      //alert("Pri shranjevanju naloge je prišlo do napake.");
     }
   }
 
@@ -252,7 +253,7 @@
       return;
     }
     try {
-      await axios.delete(`http://localhost:${PORT}/api/tasks/${taskId}`);
+      await axios.delete(`/api/tasks/${taskId}`);
       loadTasks();
     } catch (error) {
       console.error(

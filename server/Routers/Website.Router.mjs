@@ -1,5 +1,6 @@
 import express from "express";
 import NewsController from "../Controllers/News.Controller.mjs";
+import { Project } from "../Models/Project.Model.mjs";
 import { authoriseUser } from "../utils/authoriseUser.js";
 
 const router = express.Router();
@@ -66,7 +67,7 @@ router.get("/projects/:id", authoriseUser, async (req, res) => {
       .exec();
 
     if (!project) {
-      return res.status(404).render("404", { title: "Project Not Found" });
+      return res.status(404).send("Project Not Found");
     }
 
     const isOwner = project.owner.id.toString() === userId;
@@ -75,7 +76,7 @@ router.get("/projects/:id", authoriseUser, async (req, res) => {
     );
 
     if (!isOwner && !isCollaborator) {
-      return res.status(403).render("403", { title: "Access Denied" });
+      return res.status(403).send("Access Denied");
     }
 
     res.render("project", {
@@ -84,44 +85,7 @@ router.get("/projects/:id", authoriseUser, async (req, res) => {
     });
   } catch (error) {
     console.error("Error rendering project page:", error);
-    res
-      .status(500)
-      .render("error", { title: "Error", message: "Internal Server Error" });
-  }
-});
-
-router.get("/projects/:id", authoriseUser, async (req, res) => {
-  try {
-    const projectId = req.params.id;
-    const userId = req.session.user.id;
-
-    const project = await Project.findById(projectId)
-      .populate("owner collaborators tasks")
-      .exec();
-
-    if (!project) {
-      return res.status(404).render("404", { title: "Project Not Found" });
-    }
-
-    // Check if the user is the owner or a collaborator
-    const isOwner = project.owner.id.toString() === userId;
-    const isCollaborator = project.collaborators.some(
-      (collab) => collab.toString() === userId
-    );
-
-    if (!isOwner && !isCollaborator) {
-      return res.status(403).render("403", { title: "Access Denied" });
-    }
-
-    res.render("project", {
-      title: `Project - ${project.name}`,
-      project,
-    });
-  } catch (error) {
-    console.error("Error rendering project page:", error);
-    res
-      .status(500)
-      .render("error", { title: "Error", message: "Internal Server Error" });
+    res.status(500).send("Internal Server Error");
   }
 });
 

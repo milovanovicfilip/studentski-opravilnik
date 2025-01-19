@@ -14,12 +14,10 @@ export default class TaskController {
       const { title, content, status, priority, dueDate, tags, project } =
         req.body;
 
-      // Validate required fields
       if (!title) {
         return res.status(400).json({ message: "Task title is required." });
       }
 
-      // Create the task with an optional project association
       const newTask = await Task.create({
         title,
         content,
@@ -27,11 +25,10 @@ export default class TaskController {
         priority,
         dueDate,
         tags,
-        project: project || null, // Assign project if provided
-        user: req.user.id, // Associate task with the authenticated user
+        project: project || null,
+        user: req.user.id,
       });
 
-      // If associated with a project, add the task to the project's tasks array
       if (project) {
         const proj = await Project.findById(project);
         if (proj) {
@@ -40,7 +37,6 @@ export default class TaskController {
         }
       }
 
-      // Calculate task status (e.g., warning, overdue)
       const processedTask = calculateTaskStatus(newTask);
       await Task.findByIdAndUpdate(newTask.id, processedTask, { new: true });
 
@@ -59,7 +55,6 @@ export default class TaskController {
       let filter = {};
 
       if (req.query.project) {
-        // Validate project ID and check access
         const projectId = req.query.project;
         const project = await Project.findById(projectId);
 
@@ -79,10 +74,8 @@ export default class TaskController {
             .json({ message: "Access denied to this project." });
         }
 
-        // Filter tasks by this project
         filter.project = projectId;
       } else {
-        // Fetch projects where the user is the owner or a collaborator
         const accessibleProjects = await Project.find({
           $or: [{ owner: req.user.id }, { collaborators: req.user.id }],
         })
@@ -92,20 +85,14 @@ export default class TaskController {
 
         const accessibleProjectIds = accessibleProjects.map((p) => p.id);
 
-        // Filter tasks where:
-        // - The user is the creator, OR
-        // - The task is part of an accessible project
         filter.$or = [
           { user: req.user.id },
           { project: { $in: accessibleProjectIds } },
         ];
       }
 
-      const tasks = await Task.find(filter)
-        .populate("user project") // Populate user and project details
-        .exec();
+      const tasks = await Task.find(filter).populate("user project").exec();
 
-      // Update task statuses if necessary
       const updatedTasks = tasks.map((task) => calculateTaskStatus(task));
 
       await Promise.all(updatedTasks.map((task) => task.save()));

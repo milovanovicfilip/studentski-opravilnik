@@ -1,3 +1,5 @@
+// Models/Project.Model.mjs
+
 import mongoose from "mongoose";
 
 const projectSchema = new mongoose.Schema({
@@ -36,5 +38,15 @@ const projectSchema = new mongoose.Schema({
     default: Date.now,
   },
 });
+
+// Enable virtuals in JSON and Objects
+projectSchema.set("toJSON", {
+  virtuals: true,
+  transform: (doc, ret) => {
+    ret.id = ret._id.toString(); // Add 'id' field as string
+  },
+});
+
+projectSchema.set("toObject", { virtuals: true });
 
 export const Project = mongoose.model("Project", projectSchema);

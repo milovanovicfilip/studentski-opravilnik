@@ -1,19 +1,19 @@
 /* Root Variables */
 :root {
   --color-primary: #006385;
-  --color-secondary: #003B4F;
+  --color-secondary: #003b4f;
   --color-light: #e0f7ff;
   --color-background: #f4f4f4;
   --color-white: #ffffff;
   --color-text-primary: #333;
   --color-text-secondary: #666;
-  --font-family: 'Open Sans', sans-serif;
+  --font-family: "Open Sans", sans-serif;
 }
 
 body.dark-mode {
   --color-primary: #006385;
   --color-background: #333;
-  --color-dark-blue: #003B4F;
+  --color-dark-blue: #003b4f;
   --color-white: #232323;
   --color-text-primary: #f4f4f4;
   --color-text-secondary: #ccc;
@@ -21,7 +21,6 @@ body.dark-mode {
   --color-form-background: #454545;
   --color-text-dark: #e0f7ff;
 }
-
 
 /* Set dark mode on html to avoid flicker */
 html[data-theme="dark"] {
@@ -37,18 +36,17 @@ html[data-theme="dark"] body {
 
 /* Disable transition for dark mode toggle during initial load */
 #darkModeToggle,
-#darkModeToggle+.slider,
-#darkModeToggle+.slider::before {
+#darkModeToggle + .slider,
+#darkModeToggle + .slider::before {
   transition: none !important;
 }
 
 /* Re-enable transitions after page fully loads */
 html.ready #darkModeToggle,
-html.ready #darkModeToggle+.slider,
-html.ready #darkModeToggle+.slider::before {
+html.ready #darkModeToggle + .slider,
+html.ready #darkModeToggle + .slider::before {
   transition: all 0.3s ease !important;
 }
-
 
 /* General Styles */
 body {
@@ -137,7 +135,7 @@ body.dark-mode .dropdown-menu {
 }
 
 body.dark-mode .dropdown-header {
-  color: var(--color-text-secondary)
+  color: var(--color-text-secondary);
 }
 
 body.dark-mode .dropdown-item {
@@ -165,11 +163,11 @@ body.dark-mode .btn-icon:hover {
 }
 
 body.dark-mode .btn-primary {
-  color: var(--color-text-dark)
+  color: var(--color-text-dark);
 }
 
 body.dark-mode .btn-primary:hover {
-  color: var(--color-text-dark)
+  color: var(--color-text-dark);
 }
 
 /* Navigation Styles */
@@ -260,6 +258,14 @@ body.dark-mode .btn-primary:hover {
   font-size: 24px;
   color: var(--color-secondary);
   margin: 0;
+}
+
+.card-title {
+  color: var(--color-text-primary);
+}
+
+.card-text {
+  color: var(--color-text-secondary);
 }
 
 .task-item {
@@ -395,7 +401,7 @@ body.dark-mode .btn-primary:hover {
   display: none;
 }
 
-.custom-checkbox input:checked+.bi-check {
+.custom-checkbox input:checked + .bi-check {
   display: block;
 }
 
@@ -411,7 +417,7 @@ body.dark-mode .btn-primary:hover {
   width: 50px;
   height: 30px;
   --light: #d8dbe0;
-  --dark: #003B4F;
+  --dark: #003b4f;
   --link: rgb(27, 129, 112);
   --link-hover: rgb(24, 94, 82);
 }
@@ -439,7 +445,7 @@ body.dark-mode .btn-primary:hover {
   transition: 0.3s;
 }
 
-.checkbox:checked~.slider {
+.checkbox:checked ~ .slider {
   background-color: var(--light);
 }
 
@@ -456,12 +462,11 @@ body.dark-mode .btn-primary:hover {
   transition: 0.3s;
 }
 
-.checkbox:checked~.slider::before {
+.checkbox:checked ~ .slider::before {
   transform: translateX(20px);
   background-color: var(--dark);
   box-shadow: none;
 }
-
 
 /* Login and Registration Page Styles */
 .container {

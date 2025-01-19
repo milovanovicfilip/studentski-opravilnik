@@ -16,13 +16,13 @@ router.get("/getTasks/:id", authoriseUser, userController.getUserPosts);
 router.delete("/", authoriseUser, userController.removeUser);
 
 router.get("/profile", authoriseUser, async (req, res) => {
-    try {
-        const user = await userController.getUserById(req.session.user.id);
-        res.render("users-profile", { user });
-    } catch (error) {
-        console.error(error);
-        res.status(500).send("Server error");
-    }
+  try {
+    const user = await userController.getUserById(req.session.user.id);
+    res.render("users-profile", { user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server error");
+  }
 });
 router.put("/profile", authoriseUser, userController.updateProfile);
 router.get("/data", authoriseUser, userController.getUserData);

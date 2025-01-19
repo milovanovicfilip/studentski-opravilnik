@@ -1,0 +1,224 @@
+<%- include('partials/header') %>
+
+<!-- Ensure Axios is included -->
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<div class="d-flex">
+  <%- include('partials/sidebar') %>
+  <main class="flex-grow-1 p-4">
+    <div class="project-list">
+      <div
+        class="project-header d-flex justify-content-between align-items-center mb-4"
+      >
+        <h1 class="project-title">Seznam projektov</h1>
+        <button class="btn btn-primary" onclick="toggleProjectForm()">
+          <i class="bi bi-plus"></i>
+          Nov projekt
+        </button>
+      </div>
+
+      <div
+        id="projectForm"
+        class="project-form card p-4 mb-4"
+        style="display: none"
+      >
+        <input type="hidden" id="projectId" />
+        <!-- Hidden input for project ID -->
+        <div class="form-group mb-3">
+          <label for="projectName" class="form-label">Naslov projekta</label>
+          <input
+            type="text"
+            id="projectName"
+            class="form-control"
+            placeholder="Vnesite naslov projekta"
+          />
+        </div>
+        <div class="form-group mb-3">
+          <label for="projectDescription" class="form-label">Opis</label>
+          <textarea
+            id="projectDescription"
+            class="form-control"
+            placeholder="Dodajte opis projekta"
+            rows="3"
+          ></textarea>
+        </div>
+        <div class="form-group mb-3">
+          <label for="collaborators" class="form-label">Sodelavci (IDs)</label>
+          <input
+            type="text"
+            id="collaborators"
+            class="form-control"
+            placeholder="Vnesite ID-je sodelavcev ločene z vejico"
+          />
+        </div>
+        <div class="form-buttons d-flex justify-content-end">
+          <button class="btn btn-primary me-2" onclick="saveProject()">
+            Shrani
+          </button>
+          <button class="btn btn-secondary" onclick="toggleProjectForm()">
+            Prekliči
+          </button>
+        </div>
+      </div>
+
+      <div id="projectList" class="row">
+        <!-- Projects rendered here -->
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  axios.defaults.withCredentials = true;
+
+  const projectBaseUrl = "http://localhost:4000/api/projects";
+
+  function toggleProjectForm() {
+    const form = document.getElementById("projectForm");
+    form.style.display = form.style.display === "none" ? "block" : "none";
+  }
+
+  async function loadProjects() {
+    try {
+      const response = await axios.get(projectBaseUrl);
+      const projects = response.data;
+
+      const projectList = document.getElementById("projectList");
+      projectList.innerHTML = "";
+
+      if (projects.length === 0) {
+        projectList.innerHTML = `
+          <div class="col-12">
+            <div class="alert alert-info text-center" role="alert">
+              Ni projektov za prikaz.
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      projects.forEach((project, index) => {
+        // Use 'id' if available; otherwise, fallback to '_id'
+        const projectId = project.id || project._id;
+
+        const projectItem = document.createElement("div");
+        projectItem.className = "col-md-6 col-lg-4 mb-4";
+        projectItem.innerHTML = `
+          <div class="card h-100 shadow-sm">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">${project.name}</h5>
+              <p class="card-text">${project.description || "Brez opisa"}</p>
+              <div class="mt-auto">
+                <a href="/projects/${projectId}" class="btn btn-sm btn-outline-primary me-2">
+                  <i class="bi bi-eye"></i> Prikaži
+                </a>
+                <button class="btn btn-sm btn-outline-primary me-2" onclick="populateEditProjectForm('${projectId}')">
+                  <i class="bi bi-pencil-square"></i> Uredi
+                </button>
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteProject('${projectId}')">
+                  <i class="bi bi-trash"></i> Izbriši
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+        projectList.appendChild(projectItem);
+      });
+    } catch (error) {
+      console.error(
+        "Failed to load projects:",
+        error.response?.data || error.message
+      );
+      const projectList = document.getElementById("projectList");
+      projectList.innerHTML = `
+        <div class="col-12">
+          <div class="alert alert-danger text-center" role="alert">
+            Pri nalaganju projektov je prišlo do napake.
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  async function populateEditProjectForm(projectId) {
+    try {
+      const response = await axios.get(`${projectBaseUrl}/${projectId}`);
+      const project = response.data;
+
+      document.getElementById("projectId").value = project.id;
+      document.getElementById("projectName").value = project.name;
+      document.getElementById("projectDescription").value = project.description;
+      document.getElementById("collaborators").value =
+        project.collaborators.join(",");
+
+      toggleProjectForm();
+    } catch (error) {
+      console.error(
+        "Failed to populate edit form:",
+        error.response?.data || error.message
+      );
+      alert("Pri pridobivanju podatkov projekta je prišlo do napake.");
+    }
+  }
+
+  async function saveProject() {
+    const projectId = document.getElementById("projectId").value;
+    const projectName = document.getElementById("projectName").value.trim();
+    const projectDescription = document
+      .getElementById("projectDescription")
+      .value.trim();
+    const collaborators = document
+      .getElementById("collaborators")
+      .value.split(",")
+      .map((id) => id.trim())
+      .filter((id) => id.length > 0);
+
+    if (!projectName) {
+      alert("Prosimo, vnesite naslov projekta.");
+      return;
+    }
+
+    const projectData = {
+      name: projectName,
+      description: projectDescription,
+      collaborators: collaborators, // Array of user IDs
+    };
+
+    try {
+      if (projectId) {
+        await axios.put(`${projectBaseUrl}/${projectId}`, projectData);
+      } else {
+        await axios.post(projectBaseUrl, projectData);
+      }
+
+      toggleProjectForm();
+      loadProjects();
+    } catch (error) {
+      console.error(
+        "Failed to save project:",
+        error.response?.data || error.message
+      );
+      alert("Pri shranjevanju projekta je prišlo do napake.");
+    }
+  }
+
+  async function deleteProject(projectId) {
+    if (!confirm("Ste prepričani, da želite izbrisati ta projekt?")) {
+      return;
+    }
+    try {
+      await axios.delete(`${projectBaseUrl}/${projectId}`);
+      loadProjects();
+    } catch (error) {
+      console.error(
+        "Failed to delete project:",
+        error.response?.data || error.message
+      );
+      alert("Pri brisanju projekta je prišlo do napake.");
+    }
+  }
+
+  loadProjects();
+</script>
+
+<%- include('partials/footer') %>

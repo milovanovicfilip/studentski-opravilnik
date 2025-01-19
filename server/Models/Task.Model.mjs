@@ -23,15 +23,20 @@ const taskSchema = new mongoose.Schema({
     type: Date,
   },
   warning: {
-    type: Boolean, default: false
+    type: Boolean,
+    default: false,
   },
   overdue: {
     type: Boolean,
-    default: false
+    default: false,
   },
   createdAt: {
     type: Date,
     default: Date.now,
+  },
+  project: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Project",
   },
   tags: [
     {

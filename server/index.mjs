@@ -6,10 +6,13 @@ import mongoose from "mongoose";
 import session from "express-session";
 import MongoStore from "connect-mongo";
 import { fileURLToPath } from "url";
+import { authoriseUser } from "./utils/authoriseUser.js";
+import { fetchUserProjects } from "./utils/fetchUserProjects.js";
 import taskRouter from "./Routers/Task.Router.mjs";
 import userRouter from "./Routers/User.Router.mjs";
 import websiteRouter from "./Routers/Website.Router.mjs";
-import notificationRoutes from './Routers/Notification.Router.mjs';
+import projectRouter from "./Routers/Project.Router.mjs";
+import notificationRoutes from "./Routers/Notification.Router.mjs";
 
 dotenv.config();
 
@@ -50,6 +53,9 @@ app.use(cors({ origin: ["http://localhost:8080"], credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Middleware to fetch user projects
+app.use(fetchUserProjects);
+
 // Middleware to pass session user to views
 app.use((req, res, next) => {
   res.locals.user = req.session.user || null;
@@ -67,7 +73,8 @@ app.set("views", path.join(__dirname, "views"));
 app.use("/", websiteRouter);
 app.use("/api/tasks", taskRouter);
 app.use("/api/user", userRouter);
-app.use('/api/notifications', notificationRoutes);
+app.use("/api/projects", projectRouter);
+app.use("/api/notifications", notificationRoutes);
 
 // Health Check Endpoint
 app.get("/api/health", (req, res) => {

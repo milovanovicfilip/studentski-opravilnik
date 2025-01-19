@@ -5,29 +5,21 @@
   <main>
     <h2>Kanban</h2>
     <div class="kanban-container">
-     
       <div class="kanban-column" id="todo">
         <h3>To Do</h3>
-        <div class="kanban-cards">
-          <div class="kanban-card" draggable="true" data-id="1">
-            <h4>Task 1</h4>
-            <p>Opis naloge</p>
-          </div>
-          <div class="kanban-card" draggable="true" data-id="2">
-            <h4>Task 2</h4>
-            <p>Opis naloge</p>
-          </div>
+        <div class="kanban-cards" id="todo-cards">
+          
         </div>
       </div>
       <div class="kanban-column" id="in-progress">
         <h3>In Progress</h3>
-        <div class="kanban-cards">
-         
+        <div class="kanban-cards" id="in-progress-cards">
+       
         </div>
       </div>
       <div class="kanban-column" id="done">
         <h3>Done</h3>
-        <div class="kanban-cards">
+        <div class="kanban-cards" id="done-cards">
          
         </div>
       </div>
@@ -36,3 +28,32 @@
 </div>
 
 <%- include('partials/footer') %>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    fetch('/api/tasks')
+      .then(response => response.json())
+      .then(tasks => {
+        tasks.forEach(task => {
+
+          const taskCard = `
+            <div class="kanban-card" draggable="true" data-id="${task._id}">
+              <h4>${task.title}</h4>
+              <p>${task.content}</p>
+              <p><strong>Prioriteta:</strong> ${task.priority}</p>
+              <p><strong>Rok:</strong> ${new Date(task.dueDate).toLocaleDateString()}</p>
+            </div>
+          `;
+
+          if (task.status === 'pending') {
+            document.getElementById('todo-cards').innerHTML += taskCard;
+          } else if (task.status === 'in-progress') {
+            document.getElementById('in-progress-cards').innerHTML += taskCard;
+          } else if (task.status === 'completed') {
+            document.getElementById('done-cards').innerHTML += taskCard;
+          }
+        });
+      })
+      .catch(err => console.error('Napaka pri nalaganju opravil:', err));
+  });
+</script>

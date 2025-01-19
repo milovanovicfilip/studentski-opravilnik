@@ -1,0 +1,81 @@
+#calendar {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.fc-toolbar {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.fc-prev-button, .fc-next-button {
+    color: #007bff;
+    font-size: 16px;
+}
+
+.fc-button-primary {
+    background-color: #28a745;
+    color: black;
+    border-radius: 50px;
+    border: none;
+}
+
+.fc-button-primary:hover {
+    background-color: #218838;
+}
+
+.fc-daygrid-day {
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.fc-daygrid-day:hover {
+    background-color: #f1f3f5;
+}
+
+.fc-event {
+    border-radius: 5px;
+    padding: 5px;
+    background-color: #007bff;
+    color: black;
+    font-size: 14px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.fc-event-title {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.fc-daygrid-day-number {
+    text-align: center;
+    color: black;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.fc-day-header {
+    text-align: center;
+    font-weight: bold;
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.fc-daygrid-day:hover .fc-daygrid-day-number {
+    text-decoration: none;
+    color: #fff;
+}
+
+.fc-daygrid-day.fc-day-today {
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 50%;
+}
+
+.fc-event-title {
+    text-decoration: none;
+}

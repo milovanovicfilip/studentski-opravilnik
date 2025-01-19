@@ -1,5 +1,8 @@
 <%- include('partials/header') %>
 
+<!-- Ensure Axios is included -->
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
 <div class="d-flex">
   <%- include('partials/sidebar') %>
   <main>
@@ -48,6 +51,9 @@
     </div>
 
     <script>
+      // Ensure Axios sends cookies with every request
+      axios.defaults.withCredentials = true;
+
       const projectBaseUrl = "http://localhost:4000/api/projects";
 
       function toggleProjectForm() {
@@ -71,27 +77,27 @@
             const projectItem = document.createElement("div");
             projectItem.className = "project-item";
             projectItem.innerHTML = `
-          <div class="project-content">
-              <div class="project-details">
-                  <div class="project-name">${project.name}</div>
-                  <div class="project-meta">${
-                    project.description || "Brez opisa"
-                  }</div>
+              <div class="project-content">
+                  <div class="project-details">
+                      <div class="project-name">${project.name}</div>
+                      <div class="project-meta">${
+                        project.description || "Brez opisa"
+                      }</div>
+                  </div>
               </div>
-          </div>
-          <div class="project-actions">
-              <button class="btn btn-icon" onclick="populateEditProjectForm('${
-                project._id
-              }')">
-                  <i class="bi bi-pencil-square"></i>
-              </button>
-              <button class="btn btn-icon" onclick="deleteProject('${
-                project._id
-              }')">
-                  <i class="bi bi-trash"></i>
-              </button>
-          </div>
-      `;
+              <div class="project-actions">
+                  <button class="btn btn-icon" onclick="populateEditProjectForm('${
+                    project._id
+                  }')">
+                      <i class="bi bi-pencil-square"></i>
+                  </button>
+                  <button class="btn btn-icon" onclick="deleteProject('${
+                    project._id
+                  }')">
+                      <i class="bi bi-trash"></i>
+                  </button>
+              </div>
+            `;
             projectList.appendChild(projectItem);
           });
         } catch (error) {

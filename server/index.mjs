@@ -53,9 +53,6 @@ app.use(cors({ origin: ["http://localhost:8080"], credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Middleware for user authentication
-app.use(authoriseUser);
-
 // Middleware to fetch user projects
 app.use(fetchUserProjects);
 

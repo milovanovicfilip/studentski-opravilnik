@@ -131,19 +131,12 @@ export default class ProjectController {
     try {
       const { id } = req.params;
 
-      const project = await Project.findById(id);
+      // Option 1: Using findByIdAndDelete
+      const project = await Project.findByIdAndDelete(id);
 
       if (!project) {
         return res.status(404).json({ message: "Project not found." });
       }
-
-      if (project.owner.toString() !== req.user.id) {
-        return res
-          .status(403)
-          .json({ message: "Only the owner can delete the project." });
-      }
-
-      await project.remove();
 
       res.status(200).json({ message: "Project deleted successfully." });
     } catch (error) {
@@ -173,7 +166,6 @@ export default class ProjectController {
         return res.status(404).json({ message: "Project or Task not found." });
       }
 
-      // Optional: Check if the user has permission to add tasks to the project
       const isOwner = project.owner.toString() === req.user.id;
       const isCollaborator = project.collaborators.includes(req.user.id);
 
@@ -183,7 +175,6 @@ export default class ProjectController {
         });
       }
 
-      // Avoid duplicate task entries
       if (project.tasks.includes(taskId)) {
         return res
           .status(400)

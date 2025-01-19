@@ -5,9 +5,11 @@
 
 <div class="d-flex">
   <%- include('partials/sidebar') %>
-  <main>
+  <main class="flex-grow-1 p-4">
     <div class="project-list">
-      <div class="project-header">
+      <div
+        class="project-header d-flex justify-content-between align-items-center mb-4"
+      >
         <h1 class="project-title">Seznam projektov</h1>
         <button class="btn btn-primary" onclick="toggleProjectForm()">
           <i class="bi bi-plus"></i>
@@ -15,11 +17,15 @@
         </button>
       </div>
 
-      <div id="projectForm" class="project-form" style="display: none">
+      <div
+        id="projectForm"
+        class="project-form card p-4 mb-4"
+        style="display: none"
+      >
         <input type="hidden" id="projectId" />
         <!-- Hidden input for project ID -->
-        <div class="form-group">
-          <label for="projectName">Naslov projekta</label>
+        <div class="form-group mb-3">
+          <label for="projectName" class="form-label">Naslov projekta</label>
           <input
             type="text"
             id="projectName"
@@ -27,161 +33,189 @@
             placeholder="Vnesite naslov projekta"
           />
         </div>
-        <div class="form-group">
-          <label for="projectDescription">Opis</label>
+        <div class="form-group mb-3">
+          <label for="projectDescription" class="form-label">Opis</label>
           <textarea
             id="projectDescription"
             class="form-control"
             placeholder="Dodajte opis projekta"
+            rows="3"
           ></textarea>
         </div>
-        <div class="form-buttons">
-          <button class="btn btn-primary" onclick="saveProject()">
+        <div class="form-buttons d-flex justify-content-end">
+          <button class="btn btn-primary me-2" onclick="saveProject()">
             Shrani
           </button>
-          <button class="btn btn-icon" onclick="toggleProjectForm()">
+          <button class="btn btn-secondary" onclick="toggleProjectForm()">
             Prekliči
           </button>
         </div>
       </div>
 
-      <div id="projectList">
+      <div id="projectList" class="row">
         <!-- Projects rendered here -->
       </div>
     </div>
-
-    <script>
-      // Ensure Axios sends cookies with every request
-      axios.defaults.withCredentials = true;
-
-      const projectBaseUrl = "http://localhost:4000/api/projects";
-
-      function toggleProjectForm() {
-        console.log("Toggling project form visibility");
-        const form = document.getElementById("projectForm");
-        form.style.display = form.style.display === "none" ? "block" : "none";
-      }
-
-      async function loadProjects() {
-        console.log("Loading projects...");
-        try {
-          const response = await axios.get(projectBaseUrl);
-          const projects = response.data;
-
-          console.log("Projects loaded:", projects);
-
-          const projectList = document.getElementById("projectList");
-          projectList.innerHTML = "";
-
-          projects.forEach((project) => {
-            const projectItem = document.createElement("div");
-            projectItem.className = "project-item";
-            projectItem.innerHTML = `
-              <div class="project-content">
-                  <div class="project-details">
-                      <div class="project-name">${project.name}</div>
-                      <div class="project-meta">${
-                        project.description || "Brez opisa"
-                      }</div>
-                  </div>
-              </div>
-              <div class="project-actions">
-                  <button class="btn btn-icon" onclick="populateEditProjectForm('${
-                    project._id
-                  }')">
-                      <i class="bi bi-pencil-square"></i>
-                  </button>
-                  <button class="btn btn-icon" onclick="deleteProject('${
-                    project._id
-                  }')">
-                      <i class="bi bi-trash"></i>
-                  </button>
-              </div>
-            `;
-            projectList.appendChild(projectItem);
-          });
-        } catch (error) {
-          console.error(
-            "Failed to load projects:",
-            error.response?.data || error.message
-          );
-        }
-      }
-
-      async function populateEditProjectForm(projectId) {
-        console.log(`Populating edit form for project ID: ${projectId}`);
-        try {
-          const response = await axios.get(`${projectBaseUrl}/${projectId}`);
-          const project = response.data;
-
-          console.log("Project data to edit:", project);
-
-          document.getElementById("projectId").value = project._id;
-          document.getElementById("projectName").value = project.name;
-          document.getElementById("projectDescription").value =
-            project.description;
-
-          toggleProjectForm();
-        } catch (error) {
-          console.error(
-            "Failed to populate edit form:",
-            error.response?.data || error.message
-          );
-        }
-      }
-
-      async function saveProject() {
-        console.log("Saving project...");
-        const projectId = document.getElementById("projectId").value;
-        const projectName = document.getElementById("projectName").value;
-        const projectDescription =
-          document.getElementById("projectDescription").value;
-
-        const projectData = {
-          name: projectName,
-          description: projectDescription,
-        };
-
-        console.log("Project data to save:", projectData);
-
-        try {
-          if (projectId) {
-            console.log(`Updating project with ID: ${projectId}`);
-            await axios.put(`${projectBaseUrl}/${projectId}`, projectData);
-          } else {
-            console.log("Creating new project");
-            await axios.post(projectBaseUrl, projectData);
-          }
-
-          console.log("Project saved successfully");
-          toggleProjectForm();
-          loadProjects();
-        } catch (error) {
-          console.error(
-            "Failed to save project:",
-            error.response?.data || error.message
-          );
-        }
-      }
-
-      async function deleteProject(projectId) {
-        console.log(`Deleting project with ID: ${projectId}`);
-        try {
-          await axios.delete(`${projectBaseUrl}/${projectId}`);
-          console.log("Project deleted successfully");
-          loadProjects();
-        } catch (error) {
-          console.error(
-            "Failed to delete project:",
-            error.response?.data || error.message
-          );
-        }
-      }
-
-      console.log("Initializing project page");
-      loadProjects();
-    </script>
   </main>
 </div>
+
+<script>
+  axios.defaults.withCredentials = true;
+
+  const projectBaseUrl = "http://localhost:4000/api/projects";
+
+  function toggleProjectForm() {
+    console.log("Toggling project form visibility");
+    const form = document.getElementById("projectForm");
+    form.style.display = form.style.display === "none" ? "block" : "none";
+  }
+
+  async function loadProjects() {
+    console.log("Loading projects...");
+    try {
+      const response = await axios.get(projectBaseUrl);
+      const projects = response.data;
+
+      console.log("Projects loaded:", projects);
+
+      const projectList = document.getElementById("projectList");
+      projectList.innerHTML = "";
+
+      if (projects.length === 0) {
+        projectList.innerHTML = `
+          <div class="col-12">
+            <div class="alert alert-info text-center" role="alert">
+              Ni projektov za prikaz.
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      projects.forEach((project) => {
+        const projectItem = document.createElement("div");
+        projectItem.className = "col-md-6 col-lg-4 mb-4";
+        projectItem.innerHTML = `
+          <div class="card h-100 shadow-sm">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title">${project.name}</h5>
+              <p class="card-text">${project.description || "Brez opisa"}</p>
+              <div class="mt-auto">
+                <button class="btn btn-sm btn-outline-primary me-2" onclick="populateEditProjectForm('${
+                  project._id
+                }')">
+                  <i class="bi bi-pencil-square"></i> Uredi
+                </button>
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteProject('${
+                  project._id
+                }')">
+                  <i class="bi bi-trash"></i> Izbriši
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+        projectList.appendChild(projectItem);
+      });
+    } catch (error) {
+      console.error(
+        "Failed to load projects:",
+        error.response?.data || error.message
+      );
+      const projectList = document.getElementById("projectList");
+      projectList.innerHTML = `
+        <div class="col-12">
+          <div class="alert alert-danger text-center" role="alert">
+            Pri nalaganju projektov je prišlo do napake.
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  async function populateEditProjectForm(projectId) {
+    console.log(`Populating edit form for project ID: ${projectId}`);
+    try {
+      const response = await axios.get(`${projectBaseUrl}/${projectId}`);
+      const project = response.data;
+
+      console.log("Project data to edit:", project);
+
+      document.getElementById("projectId").value = project._id;
+      document.getElementById("projectName").value = project.name;
+      document.getElementById("projectDescription").value = project.description;
+
+      toggleProjectForm();
+    } catch (error) {
+      console.error(
+        "Failed to populate edit form:",
+        error.response?.data || error.message
+      );
+      alert("Pri pridobivanju podatkov projekta je prišlo do napake.");
+    }
+  }
+
+  async function saveProject() {
+    console.log("Saving project...");
+    const projectId = document.getElementById("projectId").value;
+    const projectName = document.getElementById("projectName").value.trim();
+    const projectDescription = document
+      .getElementById("projectDescription")
+      .value.trim();
+
+    if (!projectName) {
+      alert("Prosimo, vnesite naslov projekta.");
+      return;
+    }
+
+    const projectData = {
+      name: projectName,
+      description: projectDescription,
+    };
+
+    console.log("Project data to save:", projectData);
+
+    try {
+      if (projectId) {
+        console.log(`Updating project with ID: ${projectId}`);
+        await axios.put(`${projectBaseUrl}/${projectId}`, projectData);
+      } else {
+        console.log("Creating new project");
+        await axios.post(projectBaseUrl, projectData);
+      }
+
+      console.log("Project saved successfully");
+      toggleProjectForm();
+      loadProjects();
+    } catch (error) {
+      console.error(
+        "Failed to save project:",
+        error.response?.data || error.message
+      );
+      alert("Pri shranjevanju projekta je prišlo do napake.");
+    }
+  }
+
+  async function deleteProject(projectId) {
+    if (!confirm("Ste prepričani, da želite izbrisati ta projekt?")) {
+      return;
+    }
+    console.log(`Deleting project with ID: ${projectId}`);
+    try {
+      await axios.delete(`${projectBaseUrl}/${projectId}`);
+      console.log("Project deleted successfully");
+      loadProjects();
+    } catch (error) {
+      console.error(
+        "Failed to delete project:",
+        error.response?.data || error.message
+      );
+      alert("Pri brisanju projekta je prišlo do napake.");
+    }
+  }
+
+  console.log("Initializing project page");
+  loadProjects();
+</script>
 
 <%- include('partials/footer') %>

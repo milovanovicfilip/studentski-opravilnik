@@ -2,17 +2,44 @@
 
 <%- include('partials/header') %>
 
-<div class="d-flex">
-  <%- include('partials/sidebar') %>
-  <main>
-    <div class="task-list">
-      <div class="task-header">
-        <h1 class="task-title">Seznam nalog</h1>
-        <button class="btn btn-primary" onclick="toggleForm()">
-          <i class="bi bi-plus"></i>
-          Nova naloga
-        </button>
-      </div>
+    <div class="d-flex">
+        <%- include('partials/sidebar') %>
+
+            <main>
+                <div class="task-filter">
+                    <div class="form-group">
+                        <label for="filterTitle">Naslov naloge</label>
+                        <input type="text" id="filterTitle" class="form-control" placeholder="Filtriraj po naslovu">
+                    </div>
+                    <div class="form-group">
+                        <label for="filterPriority">Prioriteta</label>
+                        <select id="filterPriority" class="form-control">
+                            <option value="">Vse</option>
+                            <option value="low">Nizka</option>
+                            <option value="medium">Srednja</option>
+                            <option value="high">Visoka</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="filterStatus">Status</label>
+                        <select id="filterStatus" class="form-control">
+                            <option value="">Vsi</option>
+                            <option value="pending">Prihajajoče</option>
+                            <option value="in-progress">V teku</option>
+                            <option value="completed">Končano</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="filterTasks()">Uporabi filter</button>
+                </div>
+
+                <div class="task-list">
+                    <div class="task-header">
+                        <h1 class="task-title">Seznam nalog</h1>
+                        <button class="btn btn-primary" onclick="toggleForm()">
+                            <i class="bi bi-plus"></i>
+                            Nova naloga
+                        </button>
+                    </div>
 
       <div id="taskForm" class="task-form" style="display: none">
         <input type="hidden" id="taskId" />
@@ -44,167 +71,147 @@
         </div>
       </div>
 
-      <div id="taskList">
-        <!-- Tasks rendered here -->
-      </div>
+                    <div id="taskList">
+                        <!-- Tasks rendered here -->
+                    </div>
+                </div>
+
+                <script>
+                    window.onload = () => {
+                        loadTasks();
+                    };
+                    function filterTasks() {
+                        const title = document.getElementById("filterTitle").value;
+                        const status = document.getElementById("filterStatus").value;
+                        const priority = document.getElementById("filterPriority").value;
+                        console.log(title + ' ' + status + " " + priority);
+
+                        loadTasks(title, status, priority);
+                    }
+                    const baseUrl = "http://localhost:4000/api/tasks";
+
+                    function toggleForm() {
+                        const form = document.getElementById('taskForm');
+                        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+                    }
+
+                    async function loadTasks(title='',status='',priority='') {
+                        try {
+                            const params = new URLSearchParams();
+                            if (title) params.append('title', title);
+                            if (status) params.append('status', status);
+                            if (priority) params.append('priority', priority);
+                            console.log(params);
+                            console.log(title + ' ' + status + " " + priority);
+                            let response
+                            if(title || status || priority){
+                                response = await axios.get(`${baseUrl}/search?${params.toString()}`);
+                            }else{
+                                response = await axios.get(`${baseUrl}`);
+                            }
+                            
+                            const tasks = response.data;
+
+                            const taskList = document.getElementById("taskList");
+                            taskList.innerHTML = "";
+
+                            tasks.forEach(task => {
+                                const dueDate = new Date(task.dueDate);
+                                const now = new Date();
+                                const isOverdue = dueDate < now && task.status !== "completed";
+                                const formattedDueDate = dueDate.toLocaleDateString("sl-SI", { year: "numeric", month: "long", day: "numeric" });
+                                const translatedPriority = { low: "Nizka", medium: "Srednja", high: "Visoka" }[task.priority] || task.priority;
+
+                                const taskItem = document.createElement("div");
+                                taskItem.className = "task-item";
+                                taskItem.innerHTML = `
+                                    <div class="task-content">
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" ${task.status === "completed" ? "checked" : ""}>
+                                            <i class="bi bi-check"></i>
+                                        </label>
+                                        <div class="task-details">
+                                            ${isOverdue ? `<div style="color: red; font-weight: bold;">🚨 Zamujeno!</div>` : ""}
+                                            ${task.warning ? `<div style="color: orange;">⚠️ Naloga kmalu poteče!</div>` : ""}
+                                            <div class="task-name">${task.title}</div>
+                                            <div class="task-meta">
+                                                Rok: ${formattedDueDate}
+                                                | Prioriteta: ${translatedPriority}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="task-actions">
+                                        <button class="btn btn-icon" onclick="populateEditForm('${task._id}')">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+                                        <button class="btn btn-icon" onclick="deleteTask('${task._id}')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                `;
+                                taskList.appendChild(taskItem);
+                            });
+                        } catch (error) {
+                            console.error("Failed to load tasks:", error.response?.data || error.message);
+                        }
+                    }
+
+                    async function populateEditForm(taskId) {
+                        try {
+                            const response = await axios.get(`${baseUrl}/${taskId}`);
+                            const task = response.data;
+
+                            document.getElementById("taskId").value = task._id;
+                            document.getElementById("taskName").value = task.title;
+                            document.getElementById("taskDate").value = task.dueDate.split("T")[0];
+                            document.getElementById("taskPriority").value = task.priority;
+
+                            toggleForm();
+                        } catch (error) {
+                            console.error("Failed to populate edit form:", error.response?.data || error.message);
+                        }
+                    }
+
+                    async function saveTask() {
+                        const taskId = document.getElementById("taskId").value;
+                        const taskName = document.getElementById("taskName").value;
+                        const taskDate = document.getElementById("taskDate").value;
+                        const taskPriority = document.getElementById("taskPriority").value;
+
+                        const taskData = {
+                            title: taskName,
+                            dueDate: taskDate,
+                            priority: taskPriority,
+                            status: "pending",
+                        };
+
+                        try {
+                            if (taskId) {
+                                await axios.put(`${baseUrl}/${taskId}`, taskData);
+                            } else {
+                                await axios.post(baseUrl, taskData);
+                            }
+
+                            toggleForm();
+                            loadTasks();
+                        } catch (error) {
+                            console.error("Failed to save task:", error.response?.data || error.message);
+                        }
+                    }
+
+                    async function deleteTask(taskId) {
+                        try {
+                            await axios.delete(`${baseUrl}/${taskId}`);
+                            loadTasks();
+                        } catch (error) {
+                            console.error("Failed to delete task:", error.response?.data || error.message);
+                        }
+                    }
+
+                    loadTasks();
+                </script>
+            </main>
     </div>
 
-    <script>
-      // **Add this line to ensure credentials are sent with each request**
-      axios.defaults.withCredentials = true;
-
-      const baseUrl = "http://localhost:4000/api/tasks";
-
-      function toggleForm() {
-        const form = document.getElementById("taskForm");
-        form.style.display = form.style.display === "none" ? "block" : "none";
-      }
-
-      async function loadTasks() {
-        try {
-          const response = await axios.get(baseUrl);
-          const tasks = response.data;
-
-          const taskList = document.getElementById("taskList");
-          taskList.innerHTML = "";
-
-          tasks.forEach((task) => {
-            const dueDate = new Date(task.dueDate);
-            const now = new Date();
-            const isOverdue = dueDate < now && task.status !== "completed";
-            const formattedDueDate = dueDate.toLocaleDateString("sl-SI", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            });
-            const translatedPriority =
-              { low: "Nizka", medium: "Srednja", high: "Visoka" }[
-                task.priority
-              ] || task.priority;
-
-            const taskItem = document.createElement("div");
-            taskItem.className = "task-item";
-            taskItem.innerHTML = `
-              <div class="task-content">
-                <label class="custom-checkbox">
-                  <input type="checkbox" ${
-                    task.status === "completed" ? "checked" : ""
-                  }>
-                  <i class="bi bi-check"></i>
-                </label>
-                <div class="task-details">
-                  ${
-                    isOverdue
-                      ? `<div style="color: red; font-weight: bold;">🚨 Zamujeno!</div>`
-                      : ""
-                  }
-                  ${
-                    task.warning
-                      ? `<div style="color: orange;">⚠️ Naloga kmalu poteče!</div>`
-                      : ""
-                  }
-                  <div class="task-name">${task.title}</div>
-                  <div class="task-meta">
-                    Rok: ${formattedDueDate} | Prioriteta: ${translatedPriority}
-                  </div>
-                </div>
-              </div>
-              <div class="task-actions">
-                <button class="btn btn-icon" onclick="populateEditForm('${
-                  task._id
-                }')">
-                  <i class="bi bi-pencil-square"></i>
-                </button>
-                <button class="btn btn-icon" onclick="deleteTask('${
-                  task._id
-                }')">
-                  <i class="bi bi-trash"></i>
-                </button>
-              </div>
-            `;
-            taskList.appendChild(taskItem);
-          });
-        } catch (error) {
-          console.error(
-            "Failed to load tasks:",
-            error.response?.data || error.message
-          );
-        }
-      }
-
-      async function populateEditForm(taskId) {
-        try {
-          const response = await axios.get(`${baseUrl}/${taskId}`);
-          const task = response.data;
-
-          document.getElementById("taskId").value = task._id;
-          document.getElementById("taskName").value = task.title;
-          document.getElementById("taskDate").value =
-            task.dueDate.split("T")[0];
-          document.getElementById("taskPriority").value = task.priority;
-
-          toggleForm();
-        } catch (error) {
-          console.error(
-            "Failed to populate edit form:",
-            error.response?.data || error.message
-          );
-        }
-      }
-
-      async function saveTask() {
-        const taskId = document.getElementById("taskId").value;
-        const taskName = document.getElementById("taskName").value;
-        const taskDate = document.getElementById("taskDate").value;
-        const taskPriority = document.getElementById("taskPriority").value;
-
-        const taskData = {
-          title: taskName,
-          dueDate: taskDate,
-          priority: taskPriority,
-          status: "pending",
-        };
-
-        try {
-          if (taskId) {
-            await axios.put(`${baseUrl}/${taskId}`, taskData);
-          } else {
-            await axios.post(baseUrl, taskData);
-          }
-
-          toggleForm();
-          loadTasks();
-        } catch (error) {
-          console.error(
-            "Failed to save task:",
-            error.response?.data || error.message
-          );
-          alert(
-            error.response?.data?.message ||
-              "Pri shranjevanju naloge je prišlo do napake."
-          );
-        }
-      }
-
-      async function deleteTask(taskId) {
-        try {
-          await axios.delete(`${baseUrl}/${taskId}`);
-          loadTasks();
-        } catch (error) {
-          console.error(
-            "Failed to delete task:",
-            error.response?.data || error.message
-          );
-          alert(
-            error.response?.data?.message ||
-              "Pri brisanju naloge je prišlo do napake."
-          );
-        }
-      }
-
-      loadTasks();
-    </script>
-  </main>
-</div>
 
 <%- include('partials/footer') %>

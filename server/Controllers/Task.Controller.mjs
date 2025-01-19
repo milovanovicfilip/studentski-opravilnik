@@ -94,8 +94,9 @@ export default class TaskController {
       const tasks = await Task.find(filter).populate("user project").exec();
 
       const updatedTasks = tasks.map((task) => calculateTaskStatus(task));
-
-      await Promise.all(updatedTasks.map((task) => task.save()));
+      console.log(tasks);
+      
+      await Promise.all(updatedTasks.map(task => task.save()));
 
       res.status(200).json(updatedTasks);
     } catch (error) {
@@ -330,18 +331,29 @@ export default class TaskController {
   };
   searchTasks = async (request, response) => {
     try {
-      const { title } = request.params;
-
-      const tasks = await Task.find({ title: new RegExp(title, "i") });
-
+      const { title, status, priority } = request.query;
+      console.log(request.query);
+      
+  
+      const query = {};
+      if (title) query.title = new RegExp(title, 'i');
+      if (status) query.status = status;
+      if (priority) query.priority = priority;
+      console.log(query);
+      
+      const tasks = await Task.find(query);
+      console.log('tasks: '+ tasks);
+      
+  
       response.status(200).json(tasks);
     } catch (error) {
       response.status(400).json({
         message: "Failed to search tasks",
-        error: error.message,
+        error: error.message
       });
     }
   };
+  
 }
 
 function calculateTaskStatus(task) {

@@ -10,7 +10,6 @@ router.get("/", authoriseUser, projectController.getAllProjects);
 router.get("/:id", authoriseUser, projectController.getProjectById);
 router.put("/:id", authoriseUser, projectController.updateProject);
 router.delete("/:id", authoriseUser, projectController.deleteProject);
-
-router.post("/add-task", projectController.addTaskToProject); // Add task to project
+router.post("/add-task", authoriseUser, projectController.addTaskToProject);
 
 export default router;

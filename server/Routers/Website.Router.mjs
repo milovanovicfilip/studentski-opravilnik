@@ -20,8 +20,11 @@ router.get("/kanban", (req, res) => {
   res.render("kanban", { title: "Kanban - Študentski opravilnik" });
 });
 
-router.get('/calendar', (req, res) => {
-  res.render('calendar', { title: 'Koledar - Študentski opravilnik', page: 'calendar' });
+router.get("/calendar", (req, res) => {
+  res.render("calendar", {
+    title: "Koledar - Študentski opravilnik",
+    page: "calendar",
+  });
 });
 
 router.get("/settings", authoriseUser, async (req, res) => {
@@ -30,7 +33,7 @@ router.get("/settings", authoriseUser, async (req, res) => {
     user: req.session.user,
     sessionID: req.sessionID,
     userIP: req.ip,
-    lastLogin: req.session.lastLogin || "Ni podatkov"
+    lastLogin: req.session.lastLogin || "Ni podatkov",
   });
 });
 
@@ -51,6 +54,75 @@ router.get("/projects", (req, res) => {
     title: "Projekti - Študentski opravilnik",
     userProjects: res.locals.userProjects,
   });
+});
+
+router.get("/projects/:id", authoriseUser, async (req, res) => {
+  try {
+    const projectId = req.params.id;
+    const userId = req.session.user.id;
+
+    const project = await Project.findById(projectId)
+      .populate("owner collaborators tasks")
+      .exec();
+
+    if (!project) {
+      return res.status(404).render("404", { title: "Project Not Found" });
+    }
+
+    const isOwner = project.owner.id.toString() === userId;
+    const isCollaborator = project.collaborators.some(
+      (collab) => collab.id.toString() === userId
+    );
+
+    if (!isOwner && !isCollaborator) {
+      return res.status(403).render("403", { title: "Access Denied" });
+    }
+
+    res.render("project", {
+      title: `Project - ${project.name}`,
+      project,
+    });
+  } catch (error) {
+    console.error("Error rendering project page:", error);
+    res
+      .status(500)
+      .render("error", { title: "Error", message: "Internal Server Error" });
+  }
+});
+
+router.get("/projects/:id", authoriseUser, async (req, res) => {
+  try {
+    const projectId = req.params.id;
+    const userId = req.session.user.id;
+
+    const project = await Project.findById(projectId)
+      .populate("owner collaborators tasks")
+      .exec();
+
+    if (!project) {
+      return res.status(404).render("404", { title: "Project Not Found" });
+    }
+
+    // Check if the user is the owner or a collaborator
+    const isOwner = project.owner.id.toString() === userId;
+    const isCollaborator = project.collaborators.some(
+      (collab) => collab.toString() === userId
+    );
+
+    if (!isOwner && !isCollaborator) {
+      return res.status(403).render("403", { title: "Access Denied" });
+    }
+
+    res.render("project", {
+      title: `Project - ${project.name}`,
+      project,
+    });
+  } catch (error) {
+    console.error("Error rendering project page:", error);
+    res
+      .status(500)
+      .render("error", { title: "Error", message: "Internal Server Error" });
+  }
 });
 
 export default router;

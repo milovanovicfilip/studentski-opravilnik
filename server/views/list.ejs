@@ -2,7 +2,34 @@
 
     <div class="d-flex">
         <%- include('partials/sidebar') %>
+
             <main>
+                <div class="task-filter">
+                    <div class="form-group">
+                        <label for="filterTitle">Naslov naloge</label>
+                        <input type="text" id="filterTitle" class="form-control" placeholder="Filtriraj po naslovu">
+                    </div>
+                    <div class="form-group">
+                        <label for="filterPriority">Prioriteta</label>
+                        <select id="filterPriority" class="form-control">
+                            <option value="">Vse</option>
+                            <option value="low">Nizka</option>
+                            <option value="medium">Srednja</option>
+                            <option value="high">Visoka</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="filterStatus">Status</label>
+                        <select id="filterStatus" class="form-control">
+                            <option value="">Vsi</option>
+                            <option value="pending">Prihajajoče</option>
+                            <option value="in-progress">V teku</option>
+                            <option value="completed">Končano</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="filterTasks()">Uporabi filter</button>
+                </div>
+
                 <div class="task-list">
                     <div class="task-header">
                         <h1 class="task-title">Seznam nalog</h1>
@@ -42,6 +69,17 @@
                 </div>
 
                 <script>
+                    window.onload = () => {
+                        loadTasks();
+                    };
+                    function filterTasks() {
+                        const title = document.getElementById("filterTitle").value;
+                        const status = document.getElementById("filterStatus").value;
+                        const priority = document.getElementById("filterPriority").value;
+                        console.log(title + ' ' + status + " " + priority);
+
+                        loadTasks(title, status, priority);
+                    }
                     const baseUrl = "http://localhost:4000/api/tasks";
 
                     function toggleForm() {
@@ -49,9 +87,21 @@
                         form.style.display = form.style.display === 'none' ? 'block' : 'none';
                     }
 
-                    async function loadTasks() {
+                    async function loadTasks(title='',status='',priority='') {
                         try {
-                            const response = await axios.get(baseUrl);
+                            const params = new URLSearchParams();
+                            if (title) params.append('title', title);
+                            if (status) params.append('status', status);
+                            if (priority) params.append('priority', priority);
+                            console.log(params);
+                            console.log(title + ' ' + status + " " + priority);
+                            let response
+                            if(title || status || priority){
+                                response = await axios.get(`${baseUrl}/search?${params.toString()}`);
+                            }else{
+                                response = await axios.get(`${baseUrl}`);
+                            }
+                            
                             const tasks = response.data;
 
                             const taskList = document.getElementById("taskList");
